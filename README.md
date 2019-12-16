@@ -1,6 +1,7 @@
 # KSP-AVC Version File Validator
 
 ## Usage
+Put this in `.github/workflows/AVC-VersionFileValidator.yml`:
 ```yaml
 name: Validate AVC .version files
 on:

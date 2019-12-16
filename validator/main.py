@@ -23,12 +23,10 @@ def main():
     else:
         exclude_files = []
 
-    # version_files = (f for f in path.glob('**/*.version'))
-    # version_file_regex = re.compile(fnmatch.translate('**/*.version'), re.IGNORECASE)
-    version_files = (f for f in Path('.').iterdir()
+    version_files = (f for f in Path('.').rglob('*')
                      if f.is_file() and f not in exclude_files and f.suffix.lower() == '.version')
 
-    # How to lazy-get this with version_files being a generator?
+    # How to lazy-get this only when version_files is not empty (which is a generator)?
     schema = get_schema()
 
     for f in version_files:
@@ -59,7 +57,7 @@ def get_schema():
             'https://raw.githubusercontent.com/linuxgurugamer/KSPAddonVersionChecker/master/KSP-AVC.schema.json'
         ).json()
     except ValueError:
-        print('Current schema not valid JSON, trying embedded schema as fallback...')
+        print('Current schema not valid JSON, that\'s unfortunate...')
         exit(1)
 
 
