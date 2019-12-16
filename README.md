@@ -28,7 +28,8 @@ docker build --target dev -t avc-versionfilevalidator . && docker run -e GITHUB_
 ```
 
 ## TODO
-* Multistage Dockerfile for testing, if supported by GH Actions
+* Make GitHub use Dockerfile default stage only
+* Better logging output
 
 
 ## Notes for myself
