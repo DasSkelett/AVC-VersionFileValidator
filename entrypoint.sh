@@ -1,5 +1,4 @@
 #!/bin/sh -l
 
-# $1: GITHUB_WROKSPACE
-# $2: inputs.exclude
-python3.8 main.py "$1" "$2"
+# Only to be used by the Docker container.
+python3.8 ./validator/main.py

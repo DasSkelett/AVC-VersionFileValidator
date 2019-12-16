@@ -1,23 +1,32 @@
 import fnmatch
 import json
-import jsonschema
-from pathlib import Path
-import sys
+import os
 import re
+from pathlib import Path
+
+import jsonschema
 import requests
 
 
 def main():
-    if len(sys.argv) < 3:
-        print('Usage: python3.8 main.py $INPUT_EXCLUDE $GITHUB_WORKSPACE')
+    GH_WORKSPACE = os.getenv('GITHUB_WORKSPACE')
+    EXCLUDE = os.getenv('INPUT_EXCLUDE')
+
+    if not GH_WORKSPACE:
+        print('Error! Missing $GITHUB_WORKSPACE')
         exit(1)
 
-    exclude_files = [Path(f) for f in sys.argv[2]]
+    os.chdir(Path(os.getcwd(), GH_WORKSPACE))
+
+    if EXCLUDE:
+        exclude_files = [Path(f) for f in EXCLUDE.split(',')]
+    else:
+        exclude_files = []
 
     # version_files = (f for f in path.glob('**/*.version'))
-    version_file_regex = re.compile(fnmatch.translate('**/*.version'), re.IGNORECASE)
-    version_files = (f for f in Path(sys.argv[1]).iterdir()
-                     if f.is_fifo() and f not in exclude_files and version_file_regex.fullmatch(f))
+    # version_file_regex = re.compile(fnmatch.translate('**/*.version'), re.IGNORECASE)
+    version_files = (f for f in Path('.').iterdir()
+                     if f.is_file() and f not in exclude_files and f.suffix.lower() == '.version')
 
     # How to lazy-get this with version_files being a generator?
     schema = get_schema()
@@ -37,6 +46,7 @@ def main():
             jsonschema.validate(json_file, schema)
         except jsonschema.ValidationError as e:
             print('Validation failed, see message below:')
+            print(e.message)
             exit(1)
 
     print('Done!')

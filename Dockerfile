@@ -1,13 +1,17 @@
-FROM python:3.8-alpine
-
-ENV GITHUB_WORKSPACE $GITHUB_WORKSPACE
-COPY $GITHUB_WORKSPACE $GITHUB_WORKSPACE
-
-COPY LICENSE README.md /
+FROM python:3.8-alpine as base
 
 COPY entrypoint.sh /entrypoint.sh
-COPY validator/main.py /main.py
+COPY validator/ /validator/
 
 RUN pip install jsonschema requests
 
+WORKDIR /
+
 ENTRYPOINT ["/entrypoint.sh"]
+
+
+FROM base as dev
+COPY tests/ /tests/
+
+
+FROM base

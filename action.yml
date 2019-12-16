@@ -3,12 +3,9 @@ description: 'Validate the KSP-AVC .version file of your mod against the AVC sch
 author: 'DasSkelett'
 inputs:
   exclude:
-    description: 'Comma-separated list of paths to version files to exclude as string, e.g. "KSP-AVC.version, GameData/DogeCoinFlag/DGC.version"'
+    description: 'Comma-separated list of paths to version files to exclude as string, e.g. "KSP-AVC.version,GameData/DogeCoinFlag/DGC.version"'
     required: false
     default: ''
 runs:
   using: 'docker'
   image: 'Dockerfile'
-  args:
-    - ${{ inputs.ignore }}
-    - ${GITHUB_WORKSPACE}
