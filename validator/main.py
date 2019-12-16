@@ -1,7 +1,5 @@
-import fnmatch
 import json
 import os
-import re
 from pathlib import Path
 
 import jsonschema
@@ -39,7 +37,7 @@ def main():
                 json_file = json.load(vf)
         except json.decoder.JSONDecodeError as e:
             print('Failed loading JSON file. Check for syntax errors around the mentioned line:')
-            print(e.msg)
+            print(e)
             failed = True
             failed_files.append(f.name)
             continue
@@ -49,7 +47,7 @@ def main():
             jsonschema.validate(json_file, schema)
         except jsonschema.ValidationError as e:
             print('Validation failed:')
-            print(e.message)
+            print(e)
             failed = True
             failed_files.append(f.name)
             continue
