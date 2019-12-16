@@ -1,0 +1,16 @@
+{
+  "NAME": "KSP-AVC Version File Validator",
+  "URL": "https://github.com/DasSkelett/AVC-VersionFileValidator",
+  "DOWNLOAD": "https://github.com/DasSkelett/AVC-VersionFileValidator/releases",
+  "GITHUB": {
+    "USERNAME": "DasSkelett",
+    "REPOSITORY": "AVC-VersionFileValidator"
+  },
+  "VERSION": {
+    "MAJOR": 0,
+    "MINOR": 0,
+    "PATCH": 0,
+    "BUILD": 1
+  },
+  "KSP_VERSION": "*"
+}

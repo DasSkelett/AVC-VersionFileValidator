@@ -29,26 +29,39 @@ def main():
     # How to lazy-get this only when version_files is not empty (which is a generator)?
     schema = get_schema()
 
-    for f in version_files:
-        with f.open('r') as vf:
-            try:
-                print(f'Loading {f}')
-                json_file = json.load(vf)
-            except json.decoder.JSONDecodeError as e:
-                print('Failed loading JSON file. Check for syntax errors around the mentioned line:')
-                print(e.msg)
-                exit(1)
+    failed = False
+    failed_files = []
 
+    for f in version_files:
+        print(f'\nLoading {f}')
         try:
-            print(f'Validating {f}')
+            with f.open('r') as vf:
+                json_file = json.load(vf)
+        except json.decoder.JSONDecodeError as e:
+            print('Failed loading JSON file. Check for syntax errors around the mentioned line:')
+            print(e.msg)
+            failed = True
+            failed_files.append(f.name)
+            continue
+
+        print(f'Validating {f}')
+        try:
             jsonschema.validate(json_file, schema)
         except jsonschema.ValidationError as e:
-            print('Validation failed, see message below:')
+            print('Validation failed:')
             print(e.message)
-            exit(1)
+            failed = True
+            failed_files.append(f.name)
+            continue
+        print('Validation successful')
 
     print('Done!')
-    exit(0)
+    if failed:
+        print('\nThe following files failed validation:')
+        print(failed_files)
+        exit(1)
+    else:
+        exit(0)
 
 
 def get_schema():
