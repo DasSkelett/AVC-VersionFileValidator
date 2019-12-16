@@ -1,12 +1,14 @@
-name: 'Container Action Template'
-description: 'Get started with Container actions'
-author: 'GitHub'
-inputs: 
-  myInput:
-    description: 'Input to use'
-    default: 'world'
+name: 'KSP-AVC Version File Validator'
+description: 'Validate the KSP-AVC .version file of your mod against the AVC schema!'
+author: 'DasSkelett'
+inputs:
+  exclude:
+    description: 'Comma-separated list of paths to version files to exclude as string, e.g. "KSP-AVC.version, GameData/DogeCoinFlag/DGC.version"'
+    required: false
+    default: ''
 runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-    - ${{ inputs.myInput }}
+    - ${{ inputs.ignore }}
+    - ${GITHUB_WORKSPACE}
