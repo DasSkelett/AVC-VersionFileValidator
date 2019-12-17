@@ -7,44 +7,49 @@ import requests
 
 
 # Returns (status, successful, failed, ignored)
-def validate(exclude) -> (int, [], [], []):
-    exclusions = []
+def validate(exclude) -> (int, set, set, set):
+    version_files = set()
+    successful_files = set()
+    failed_files = set()
+    ignored_files = set()
+
+    all_exclusions = set()
     if exclude:
         try:
-            globs = list(eval(exclude))
-        except SyntaxError:
-            # Hopefully it is just a single element.
-            globs = [exclude]
+            globs = json.loads(exclude)
+        except json.decoder.JSONDecodeError as e:
+            # Not valid JSON
+            print('The exclusion parameter is not a valid JSON array:')
+            print(str(e))
+            return 1, successful_files, failed_files, ignored_files
+
+        if isinstance(globs, str):
+            globs = [globs]
         for _glob in globs:
-            exclusions.append(_glob)
+            all_exclusions = all_exclusions.union(Path().glob(_glob))
+        print(all_exclusions)
 
     # GH will set the cwd of the container to the so-called workspace, which is a clone of the triggering repo,
     # assuming the user remembered to add the 'actions/checkout' step before.
     found_files = [f for f in Path('.').rglob('*')
                    if f.is_file() and f.suffix.lower() == '.version']
 
-    version_files = []
-    ignored_files = []
-
     for f in found_files:
-        if check_exclusion(f, exclusions):
-            ignored_files.append(f)
+        if f in all_exclusions:
+            ignored_files.add(f)
         else:
-            version_files.append(f)
+            version_files.add(f)
 
     print(f'Ignoring {[str(f) for f in ignored_files]}')
 
     if not version_files:
         print('No version files found.')
-        return 0, [], [], ignored_files
+        return 0, successful_files, failed_files, ignored_files
 
     print(f'Found {[str(f) for f in version_files]}')
     schema = get_schema()
     if not schema:
-        return 1, [], [], ignored_files
-
-    successful_files = []
-    failed_files = []
+        return 1, successful_files, failed_files, ignored_files
 
     for f in version_files:
         print(f'\nLoading {f}')
@@ -54,7 +59,7 @@ def validate(exclude) -> (int, [], [], []):
         except json.decoder.JSONDecodeError as e:
             print('Failed loading JSON file. Check for syntax errors around the mentioned line:')
             print(e)
-            failed_files.append(f)
+            failed_files.add(f)
             continue
 
         print(f'Validating {f}')
@@ -63,9 +68,9 @@ def validate(exclude) -> (int, [], [], []):
         except jsonschema.ValidationError as e:
             print('Validation failed:')
             print(e)
-            failed_files.append(f)
+            failed_files.add(f)
             continue
-        successful_files.append(f)
+        successful_files.add(f)
         print('Validation successful')
 
     print('Done!')
@@ -86,14 +91,6 @@ def get_schema():
     except ValueError:
         print('Current schema not valid JSON, that\'s unfortunate...')
         return None
-
-
-def check_exclusion(file, exclusions):
-    for exc in exclusions:
-        if file.match(exc):
-            # Ignore this file!
-            return True
-    return False
 
 
 if __name__ == "__main__":

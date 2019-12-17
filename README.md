@@ -30,11 +30,13 @@ jobs:
         uses: DasSkelett/AVC-VersionFileValidator@v1
 ```
 
-Optionally, add the following after `- name: Validate files` to exclude `invalid.version` and every version file in `test/corruptVersionFiles/`:
+Optionally, add the following after `- name: Validate files` to exclude `invalid.version` and every version file in `test/corruptVersionFiles/` and any subdirectory of it:
 ```yaml
         with:
-          exclude: 'invalid.version,test/corruptVersionFiles/*.version'
+          exclude: '["./invalid.version", "./test/corruptVersionFiles/**/*.version"]'
 ```
+The supplied string has to be a valid JSON array!
+For the globbing syntax, see the [pathlib documentation](https://docs.python.org/3.5/library/pathlib.html#pathlib.PurePath.match):
 
 ## Local testing
 ### Run tests in Docker Container

@@ -1,7 +1,8 @@
-# This file contains all notable changes to the AVC-VersonFileValidator
+# This file contains all notable changes to the AVC-VersionFileValidator
 
 ## master (not included in any release yet)
-* Allow wildcards in the exclusion input arguments. They are evaluated according to Python3's pathlib Glob()/Match() functions.
+* Allow wildcards in the exclusion input arguments. They are evaluated according to Python3's pathlib.Glob() function,
+    so recursive exclusions (`**/*.version`) are supported. The exclusion value has to be a JSON array now!
 * Output handy details when finishing validation (number of failed, successful, ignored)
 * Add CHANGELOG.md
 * Push PyCharm IDE settings into repository.

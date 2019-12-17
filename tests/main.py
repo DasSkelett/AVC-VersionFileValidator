@@ -6,10 +6,12 @@ import validator.main as validator
 
 
 class TestDefault(TestCase):
-    os.chdir('./tests/workspaces/default')
+    @classmethod
+    def setUpClass(cls):
+        os.chdir('./tests/workspaces/default')
 
     def test_validWorkspace_excludes_recursive(self):
-        (status, successful, failed, ignored) = validator.validate('recursiveness/failing-validation.version')
+        (status, successful, failed, ignored) = validator.validate('["failing/failing-validation.version"]')
         self.assertEqual(status, 0)
 
     def test_invalidWorkspace_recursive(self):
@@ -17,13 +19,27 @@ class TestDefault(TestCase):
         self.assertEqual(status, 1)
 
     def test_exclusionWildcard(self):
-        (status, successful, failed, ignored) = validator.validate('recursiveness/*')
-        print(ignored)
+        (status, successful, failed, ignored) = validator.validate('["failing/*.version"]')
         self.assertEqual(status, 0)
-        # assertCountEqual() has a misleading name. It _does_ also check whether the elements in the lists are the same,
-        # ignoring their order. Not only the item count.
-        self.assertCountEqual(successful, [Path('default.version')])
-        self.assertCountEqual(ignored,
-                              [Path('recursiveness/failing-validation.version'),
-                               Path('recursiveness/recursive.version')])
-        self.assertEqual(failed, [])
+        self.assertSetEqual(successful, {Path('default.version'), Path('recursiveness/recursive.version'),
+                                         Path('recursiveness/recursiveness2/recursive2.version')})
+        self.assertSetEqual(ignored, {Path('failing/failing-validation.version')})
+        self.assertEqual(failed, set())
+
+    def test_excludeAll(self):
+        (status, successful, failed, ignored) = validator.validate('["./**/*"]')
+        self.assertEqual(status, 0)
+        self.assertSetEqual(successful, set())
+        self.assertSetEqual(ignored, {Path('default.version'),
+                                      Path('failing/failing-validation.version'),
+                                      Path('recursiveness/recursive.version'),
+                                      Path('recursiveness/recursiveness2/recursive2.version')})
+        self.assertEqual(failed, set())
+
+    def test_recursiveExclusion(self):
+        (status, successful, failed, ignored) = validator.validate('["./recursiveness/**/*"]')
+        self.assertEqual(status, 1)
+        self.assertSetEqual(successful, {Path('default.version')})
+        self.assertSetEqual(ignored, {Path('recursiveness/recursive.version'),
+                                      Path('recursiveness/recursiveness2/recursive2.version')})
+        self.assertEqual(failed, {Path('failing/failing-validation.version')})
