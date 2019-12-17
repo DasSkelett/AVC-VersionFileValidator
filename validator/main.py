@@ -30,14 +30,11 @@ def validate(exclude) -> (int, set, set, set):
 
     # GH will set the cwd of the container to the so-called workspace, which is a clone of the triggering repo,
     # assuming the user remembered to add the 'actions/checkout' step before.
-    found_files = [f for f in Path().rglob('*')
-                   if f.is_file() and f.suffix.lower() == '.version']
+    found_files = {f for f in Path().rglob('*')
+                   if f.is_file() and f.suffix.lower() == '.version'}
 
-    for f in found_files:
-        if f in all_exclusions:
-            ignored_files.add(f)
-        else:
-            version_files.add(f)
+    ignored_files = found_files.intersection(all_exclusions)
+    version_files = found_files.difference(all_exclusions)
 
     print(f'\nIgnoring {[str(f) for f in ignored_files]}')
 
