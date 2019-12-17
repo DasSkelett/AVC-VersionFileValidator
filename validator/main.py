@@ -17,21 +17,20 @@ def validate(exclude) -> (int, set, set, set):
     if exclude:
         try:
             globs = json.loads(exclude)
-        except json.decoder.JSONDecodeError as e:
-            # Not valid JSON
-            print('The exclusion parameter is not a valid JSON array:')
-            print(str(e))
-            return 1, successful_files, failed_files, ignored_files
+        except json.decoder.JSONDecodeError:
+            # Not a valid JSON array, assume it is a single exclusion glob
+            globs = [exclude]
 
+        # If someone passes a string like this: '"./*.version"'
         if isinstance(globs, str):
             globs = [globs]
+
         for _glob in globs:
             all_exclusions = all_exclusions.union(Path().glob(_glob))
-        print(all_exclusions)
 
     # GH will set the cwd of the container to the so-called workspace, which is a clone of the triggering repo,
     # assuming the user remembered to add the 'actions/checkout' step before.
-    found_files = [f for f in Path('.').rglob('*')
+    found_files = [f for f in Path().rglob('*')
                    if f.is_file() and f.suffix.lower() == '.version']
 
     for f in found_files:
@@ -40,7 +39,7 @@ def validate(exclude) -> (int, set, set, set):
         else:
             version_files.add(f)
 
-    print(f'Ignoring {[str(f) for f in ignored_files]}')
+    print(f'\nIgnoring {[str(f) for f in ignored_files]}')
 
     if not version_files:
         print('No version files found.')

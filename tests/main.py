@@ -10,8 +10,8 @@ class TestDefault(TestCase):
     def setUpClass(cls):
         os.chdir('./tests/workspaces/default')
 
-    def test_validWorkspace_excludes_recursive(self):
-        (status, successful, failed, ignored) = validator.validate('["failing/failing-validation.version"]')
+    def test_doubleQuotation(self):
+        (status, successful, failed, ignored) = validator.validate('"failing/failing-validation.version"')
         self.assertEqual(status, 0)
 
     def test_invalidWorkspace_recursive(self):
@@ -19,7 +19,7 @@ class TestDefault(TestCase):
         self.assertEqual(status, 1)
 
     def test_exclusionWildcard(self):
-        (status, successful, failed, ignored) = validator.validate('["failing/*.version"]')
+        (status, successful, failed, ignored) = validator.validate('failing/*.version')
         self.assertEqual(status, 0)
         self.assertSetEqual(successful, {Path('default.version'), Path('recursiveness/recursive.version'),
                                          Path('recursiveness/recursiveness2/recursive2.version')})
@@ -43,3 +43,11 @@ class TestDefault(TestCase):
         self.assertSetEqual(ignored, {Path('recursiveness/recursive.version'),
                                       Path('recursiveness/recursiveness2/recursive2.version')})
         self.assertEqual(failed, {Path('failing/failing-validation.version')})
+
+    def test_multipleExclusions(self):
+        (status, successful, failed, ignored) = validator.validate('["./*.version", "./failing/*"]')
+        self.assertEqual(status, 0)
+        self.assertSetEqual(successful, {Path('recursiveness/recursive.version'),
+                                         Path('recursiveness/recursiveness2/recursive2.version')})
+        self.assertSetEqual(ignored, {Path('default.version'), Path('failing/failing-validation.version')})
+        self.assertEqual(failed, set())
