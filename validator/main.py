@@ -6,28 +6,20 @@ import jsonschema
 import requests
 
 
-def main():
-    GH_WORKSPACE = os.getenv('GITHUB_WORKSPACE')
-    EXCLUDE = os.getenv('INPUT_EXCLUDE')
-
-    if not GH_WORKSPACE:
-        print('Error! Missing $GITHUB_WORKSPACE')
-        exit(1)
-
-    os.chdir(Path(os.getcwd(), GH_WORKSPACE))
-
-    if EXCLUDE:
-        exclude_files = [Path(f) for f in EXCLUDE.split(',')]
+def validate(exclude):
+    if exclude:
+        exclude_files = [Path(f) for f in exclude.split(',')]
     else:
         exclude_files = []
 
+    # GH will set the cwd of the container to the so-called workspace, which is a clone of the triggering repo,
+    # assuming the user remembered to add the 'actions/checkout' step before.
     version_files = (f for f in Path('.').rglob('*')
                      if f.is_file() and f not in exclude_files and f.suffix.lower() == '.version')
 
     # How to lazy-get this only when version_files is not empty (which is a generator)?
     schema = get_schema()
 
-    failed = False
     failed_files = []
 
     for f in version_files:
@@ -38,7 +30,6 @@ def main():
         except json.decoder.JSONDecodeError as e:
             print('Failed loading JSON file. Check for syntax errors around the mentioned line:')
             print(e)
-            failed = True
             failed_files.append(f.name)
             continue
 
@@ -48,21 +39,21 @@ def main():
         except jsonschema.ValidationError as e:
             print('Validation failed:')
             print(e)
-            failed = True
             failed_files.append(f.name)
             continue
         print('Validation successful')
 
     print('Done!')
-    if failed:
+    if failed_files:
         print('\nThe following files failed validation:')
         print(failed_files)
-        exit(1)
+        return 1
     else:
-        exit(0)
+        return 0
 
 
 def get_schema():
+    print('Fetching schema...')
     try:
         return requests.get(
             'https://raw.githubusercontent.com/linuxgurugamer/KSPAddonVersionChecker/master/KSP-AVC.schema.json'
@@ -73,4 +64,6 @@ def get_schema():
 
 
 if __name__ == "__main__":
-    main()
+    EXCLUDE = os.getenv('INPUT_EXCLUDE')
+
+    exit(validate(EXCLUDE))

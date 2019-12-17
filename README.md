@@ -1,7 +1,17 @@
 # KSP-AVC Version File Validator
 
+This repository hosts a GitHub Action that you can use in a workflow in your mod repo.
+It will validate all KSP-AVC version files it can find in the repository.
+
+If you simply want to check the version file once, run:
+```sh
+    wget https://raw.githubusercontent.com/linuxgurugamer/KSPAddonVersionChecker/master/KSP-AVC.schema.json
+    pip3 install --user jsonschema 
+    python3 -m jsonschema -i YourMod.version KSP-AVC.schema.json
+```
+
 ## Usage
-Put this in `.github/workflows/AVC-VersionFileValidator.yml`:
+Put this in `YourMod/.github/workflows/AVC-VersionFileValidator.yml`:
 ```yaml
 name: Validate AVC .version files
 on:
@@ -20,16 +30,31 @@ jobs:
         uses: DasSkelett/AVC-VersionFileValidator@master
 ```
 
+Optionally, add the following after `- name: Validate files` to exclude `invalid.version` and `test/corruptversionfile.version`:
+```yaml
+        with:
+          exclude: 'invalid.version,test/corruptversionfile.version'
+```
+
 ## Local testing
-For local testing, run the container like this:
+### Run tests in Docker Container
+If you want to run the unit tests using Docker:
 ```sh
-export GITHUB_WORKSPACE="./tests/workspaces/default"
 export INPUT_EXCLUDE=""
-docker build --target dev -t avc-versionfilevalidator . && docker run -e GITHUB_WORKSPACE -e INPUT_EXCLUDE avc-versionfilevalidator
+docker build --target dev -t avc-versionfilevalidator . && docker run -e INPUT_EXCLUDE avc-versionfilevalidator
+```
+
+### Without Docker Container
+If you want to run the unit tests on your host, do the following.
+Note that the test framework assumes that your current working directory is this project's root.
+```sh
+python3 -m unittest tests/main.py
 ```
 
 ## TODO
-* Make GitHub use Dockerfile default stage only
+* Make GitHub build Dockerfile default stage only
+* Exclusion wildcards (`tests/*`, `invalid*.version`)
+* Option to only run check specific version files (ignores exclusion)
 * Better logging output
 
 

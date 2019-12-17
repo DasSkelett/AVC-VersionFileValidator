@@ -1,16 +1,14 @@
 FROM python:3.8-alpine as base
-
 COPY validator/ /validator/
-
 RUN pip install jsonschema requests
-
 ENTRYPOINT ["python3.8"]
 
 
-FROM base as dev
+FROM base as tests
 COPY tests/ /tests/
-CMD ["./validator/main.py"]
+WORKDIR /
+CMD ["-m", "unittest", "tests/main.py"]
 
 
-FROM base
+FROM base as prod
 CMD ["/validator/main.py"]
