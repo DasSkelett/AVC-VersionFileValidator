@@ -6,7 +6,7 @@ It will validate all KSP-AVC version files it can find in the repository.
 If you simply want to check the version file once, run:
 ```sh
     wget https://raw.githubusercontent.com/linuxgurugamer/KSPAddonVersionChecker/master/KSP-AVC.schema.json
-    pip3 install --user jsonschema 
+    pip3 install --user jsonschema
     python3 -m jsonschema -i YourMod.version KSP-AVC.schema.json
 ```
 
@@ -27,13 +27,13 @@ jobs:
         with:
           fetch-depth: 1
       - name: Validate files
-        uses: DasSkelett/AVC-VersionFileValidator@master
+        uses: DasSkelett/AVC-VersionFileValidator@v1
 ```
 
-Optionally, add the following after `- name: Validate files` to exclude `invalid.version` and `test/corruptversionfile.version`:
+Optionally, add the following after `- name: Validate files` to exclude `invalid.version` and every version file in `test/corruptVersionFiles/`:
 ```yaml
         with:
-          exclude: 'invalid.version,test/corruptversionfile.version'
+          exclude: 'invalid.version,test/corruptVersionFiles/*.version'
 ```
 
 ## Local testing
@@ -53,7 +53,6 @@ python3 -m unittest tests/main.py
 
 ## TODO
 * Make GitHub build Dockerfile default stage only
-* Exclusion wildcards (`tests/*`, `invalid*.version`)
 * Option to only run check specific version files (ignores exclusion)
 * Better logging output
 
