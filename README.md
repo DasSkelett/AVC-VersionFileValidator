@@ -1,7 +1,11 @@
 # KSP-AVC Version File Validator
 
 This repository hosts a Docker-based GitHub Action that you can use in a workflow in your mod repo.
-It will validate all KSP-AVC version files it can find in the repository.
+It will validate all KSP-AVC version files in the repository against [the official KSP-AVC schema](https://github.com/linuxgurugamer/KSPAddonVersionChecker/blob/master/KSP-AVC.schema.json).
+
+This is intended for authors and maintainers of [Kerbal Space Program](https://www.kerbalspaceprogram.com/) mods.
+
+No more missing commas that prevent your latest release from being indexed by the CKAN.
 
 ## Usage
 ### As GitHub Action in a workflow (default)
@@ -33,8 +37,8 @@ Optionally, add the following after `- name: Validate files` to exclude `invalid
         with:
           exclude: '["./invalid.version", "./test/corruptVersionFiles/**/*.version"]'
 ```
-The supplied string has to be a valid JSON array (except it's a single file/globbing statement, then it can be a simple string)!
-For the globbing syntax, see the [pathlib documentation](https://docs.python.org/3.5/library/pathlib.html#pathlib.PurePath.match):
+The supplied string has to be a valid JSON array (except it's a single file or globbing statement, then it can be a simple string)!
+For the globbing syntax, see the [pathlib documentation](https://docs.python.org/3.5/library/pathlib.html#pathlib.PurePath.match).
 
 **For more workflow file examples, see the [examples folder](https://github.com/DasSkelett/AVC-VersionFileValidator/tree/master/examples).**
 
@@ -45,6 +49,7 @@ wget https://raw.githubusercontent.com/linuxgurugamer/KSPAddonVersionChecker/mas
 pip3 install --user jsonschema
 python3 -m jsonschema -i YourMod.version KSP-AVC.schema.json
 ```
+Is you use an IDEs that supports custom JSON schemas, I strongly recommend using it.
 
 ### Validate multiple .version files once on your PC
 If you want to check an entire local directory with potentially multiple version files, use this action as standard Python application:
@@ -73,6 +78,8 @@ The repository is set up in a way that supports running the app directly or in a
 Same goes for the tests. You only have to pay attention what your current working directory is when you invoke Python!  
 
 ### Testing
+This project uses `unittest`, which is part of the Python stdlib.
+
 #### Run tests in Docker Container
 If you want to run the unit tests using Docker:
 ```sh
@@ -81,10 +88,10 @@ docker build --target tests -t avc-versionfilevalidator . && docker run avc-vers
 
 #### Without Docker Container
 If you want to run the unit tests on your host, do the following.
-Note that the test framework assumes that your current working directory is this project's root.
 ```sh
 python3 -m unittest tests/main.py
 ```
+Note that the test framework assumes that your current working directory is this project's root.
 
 ## TODO
 * Make GitHub build Dockerfile default stage only (currently also executes the steps in the `tests` stage, which is unnecessary)
