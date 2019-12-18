@@ -1,6 +1,7 @@
 FROM python:3.8-alpine as base
 COPY validator/ /validator/
-RUN pip install jsonschema requests
+COPY requirements.txt ./
+RUN pip install -r requirements.txt
 ENTRYPOINT ["python3.8"]
 
 

@@ -1,0 +1,23 @@
+# AVC-VersionFileValidator (https://github.com/DasSkelett/AVC-VersionFileValidator)
+# Copyright (c) 2019 DasSkelett <https://github.com/DasSkelett>
+#
+# This workflow excludes some .version files.
+# It supports globbing according to Python3 pathlib.Path.glob() rules (so also recursive globs with `**`).
+# Make sure the exclusion string is a valid JSON array!
+name: Validate AVC .version files
+on:
+  push:
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  validate_version_files:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      - name: Validate files
+        with:
+          exclude: '["./invalid.version", "./test/corruptVersionFiles/**/*.version"]'
+        uses: DasSkelett/AVC-VersionFileValidator@v1
