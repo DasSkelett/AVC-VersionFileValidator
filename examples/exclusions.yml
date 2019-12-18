@@ -1,6 +1,3 @@
-# AVC-VersionFileValidator (https://github.com/DasSkelett/AVC-VersionFileValidator)
-# Copyright (c) 2019 DasSkelett <https://github.com/DasSkelett>
-#
 # This workflow excludes some .version files.
 # It supports globbing according to Python3 pathlib.Path.glob() rules (so also recursive globs with `**`).
 # Make sure the exclusion string is a valid JSON array!

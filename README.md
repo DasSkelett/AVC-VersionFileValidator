@@ -5,7 +5,7 @@ It will validate all KSP-AVC version files it can find in the repository.
 
 ## Usage
 ### As GitHub Action in a workflow (default)
-Download the [standard workflow file](https://github.com/DasSkelett/AVC-VersionFileValidator/blob/master/examples/standard.yml) and save it as `<YourMod>/.github/workflows/AVC-VersionFileValidator.yml`.
+Download the [standard workflow file](https://github.com/DasSkelett/AVC-VersionFileValidator/blob/master/examples/standard.yml) and save it under `<YourMod>/.github/workflows/AVC-VersionFileValidator.yml`.
 Then commit and push it to GitHub.
  
 Alternatively, copy the following and put it in `<YourMod>/.github/workflows/AVC-VersionFileValidator.yml`.
