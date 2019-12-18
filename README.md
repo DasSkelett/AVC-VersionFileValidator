@@ -33,7 +33,7 @@ Optionally, add the following after `- name: Validate files` to exclude `invalid
         with:
           exclude: '["./invalid.version", "./test/corruptVersionFiles/**/*.version"]'
 ```
-The supplied string has to be a valid JSON array!
+The supplied string has to be a valid JSON array (except it's a single file/globbing statement, then it can be a simple string)!
 For the globbing syntax, see the [pathlib documentation](https://docs.python.org/3.5/library/pathlib.html#pathlib.PurePath.match):
 
 **For more workflow file examples, see the [examples folder](https://github.com/DasSkelett/AVC-VersionFileValidator/tree/master/examples).**
