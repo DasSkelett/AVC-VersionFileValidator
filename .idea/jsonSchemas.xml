@@ -12,7 +12,17 @@
                 <list>
                   <Item>
                     <option name="pattern" value="true" />
+                    <option name="path" value="*.Version" />
+                    <option name="mappingKind" value="Pattern" />
+                  </Item>
+                  <Item>
+                    <option name="pattern" value="true" />
                     <option name="path" value="*.version" />
+                    <option name="mappingKind" value="Pattern" />
+                  </Item>
+                  <Item>
+                    <option name="pattern" value="true" />
+                    <option name="path" value="*.VERSION" />
                     <option name="mappingKind" value="Pattern" />
                   </Item>
                 </list>

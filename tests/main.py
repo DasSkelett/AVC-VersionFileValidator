@@ -6,9 +6,15 @@ import validator.main as validator
 
 
 class TestDefault(TestCase):
+    old_cwd = os.getcwd()
+
     @classmethod
     def setUpClass(cls):
         os.chdir('./tests/workspaces/default')
+
+    @classmethod
+    def tearDownClass(cls):
+        os.chdir(cls.old_cwd)
 
     def test_doubleQuotation(self):
         (status, successful, failed, ignored) = validator.validate('"failing/failing-validation.version"')
@@ -51,3 +57,22 @@ class TestDefault(TestCase):
                                          Path('recursiveness/recursiveness2/recursive2.version')})
         self.assertSetEqual(ignored, {Path('default.version'), Path('failing/failing-validation.version')})
         self.assertEqual(failed, set())
+
+
+class TestStrangeNames(TestCase):
+    old_cwd = os.getcwd()
+
+    @classmethod
+    def setUpClass(cls):
+        os.chdir('./tests/workspaces/strange-names')
+
+    @classmethod
+    def tearDownClass(cls):
+        os.chdir(cls.old_cwd)
+
+    def test_findsAll(self):
+        (status, successful, failed, ignored) = validator.validate('')
+        self.assertEqual(status, 1)
+        self.assertSetEqual(successful, {Path('CAPS.VERSION')})
+        self.assertSetEqual(failed, {Path('camelCaseVersionMissing.Version')})
+        self.assertSetEqual(ignored, set())
