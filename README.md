@@ -1,7 +1,7 @@
 # KSP-AVC Version File Validator
 
-This repository hosts a Docker-based GitHub Action that you can use in a workflow in your mod repo.
-It will validate all KSP-AVC version files in the repository against [the official KSP-AVC schema](https://github.com/linuxgurugamer/KSPAddonVersionChecker/blob/master/KSP-AVC.schema.json).
+This repository hosts a Docker-based GitHub Action written in Python3 that you can use in a workflow in your [KSP](https://www.kerbalspaceprogram.com/) mod repo.
+It will validate all [KSP-AVC](https://github.com/linuxgurugamer/KSPAddonVersionChecker) version files in the repository against [the official KSP-AVC schema](https://github.com/linuxgurugamer/KSPAddonVersionChecker/blob/master/KSP-AVC.schema.json).
 
 This is intended for authors and maintainers of [Kerbal Space Program](https://www.kerbalspaceprogram.com/) mods.
 
