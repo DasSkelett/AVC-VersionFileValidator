@@ -1,14 +1,16 @@
 {
   "NAME": "KSP-AVC Version File Validator",
+  "URL": "https://raw.githubusercontent.com/DasSkelett/AVC-VersionFileValidator/master/tests/workspaces/single-files/valid-remote.version",
   "DOWNLOAD": "https://github.com/DasSkelett/AVC-VersionFileValidator/releases",
   "GITHUB": {
     "USERNAME": "DasSkelett",
     "REPOSITORY": "AVC-VersionFileValidator"
   },
   "VERSION": {
-    "MAJOR": 1,
-    "MINOR": 1,
-    "PATCH": 1
+    "MAJOR": 0,
+    "MINOR": 0,
+    "PATCH": 0,
+    "BUILD": 1
   },
   "KSP_VERSION": "any"
 }
