@@ -96,6 +96,25 @@ def check_single_file(f: Path, schema):
     print(f'Validating {f}')
     jsonschema.validate(json_file, schema)
 
+    # Check URL property ("Location of a remote version file for update checking")
+    vf_url = json_file.get('URL')
+    if vf_url:
+        try:
+            remote = json.loads(requests.get(vf_url).content)
+            jsonschema.validate(remote, schema)
+        except requests.exceptions.RequestException as e:
+            print(f'Failed downloading remote version file at {vf_url}. Note that the URL property, when used, \n'
+                  'must point to the "Location of a remote version file for update checking":')
+            raise e
+        except json.decoder.JSONDecodeError as e:
+            print(f'Failed loading remote version file at {vf_url}. Note that the URL property, when used, \n'
+                  'must point to the "Location of a remote version file for update checking":')
+            raise e
+        except jsonschema.ValidationError as e:
+            print(f'Validation failed for remote version file at {vf_url}. Note that the URL property, when used, \n'
+                  'must point to the "Location of a remote version file for update checking":')
+            raise e
+
 
 if __name__ == "__main__":
     EXCLUDE = os.getenv('INPUT_EXCLUDE')

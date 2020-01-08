@@ -75,4 +75,25 @@ class TestStrangeNames(TestCase):
         self.assertEqual(status, 1)
         self.assertSetEqual(successful, {Path('CAPS.VERSION')})
         self.assertSetEqual(failed, {Path('camelCaseVersionMissing.Version')})
+        # Make sure 'not-detected.version.json' has not been detected.
         self.assertSetEqual(ignored, set())
+
+
+class TestSingleFiles(TestCase):
+    old_cwd = os.getcwd()
+
+    @classmethod
+    def setUpClass(cls):
+        os.chdir('./tests/workspaces/single-files')
+
+    @classmethod
+    def tearDownClass(cls):
+        os.chdir(cls.old_cwd)
+
+    def test_invalidRemote(self):
+        (status, successful, failed, ignored) = validator.validate('')
+        self.assertIn(Path('invalid-remote.version'), failed)
+
+    def test_validRemote(self):
+        (status, successful, failed, ignored) = validator.validate('')
+        self.assertIn(Path('valid-remote.version'), successful)

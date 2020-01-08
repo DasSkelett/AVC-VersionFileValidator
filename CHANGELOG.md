@@ -1,6 +1,7 @@
 # This file contains all notable changes to the AVC-VersionFileValidator
 
 ## master (not included in any release yet)
+* Validate remote version file if specified with `URL` property.
 
 
 ## v1
