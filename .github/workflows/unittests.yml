@@ -21,7 +21,7 @@ jobs:
         pip install -r requirements.txt
     - name: Run unit tests directly
       run: |
-        python -m unittest tests/main.py
+        python -m unittest tests
     - name: Run unit tests in Docker container
       run: |
         docker build --target tests -t avc-versionfilevalidator .

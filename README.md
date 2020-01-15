@@ -49,7 +49,7 @@ wget https://raw.githubusercontent.com/linuxgurugamer/KSPAddonVersionChecker/mas
 pip3 install --user jsonschema
 python3 -m jsonschema -i YourMod.version KSP-AVC.schema.json
 ```
-Is you use an IDEs that supports custom JSON schemas, I strongly recommend using it.
+Is you use an IDEs that supports custom JSON schemas, I strongly recommend using this feature.
 
 ### Validate multiple .version files once on your PC
 If you want to check an entire local directory with potentially multiple version files, use this action as standard Python application:
@@ -59,7 +59,7 @@ cd AVC-VersionFileValidator
 pip3 install --user -r requirements.txt
 # It is important that your current working directory is the directory where the version files you want to test are located!  
 cd ../<YourMod>
-python3 ../AVC-VersionFileValidator/validator/main.py
+python3 ../AVC-VersionFileValidator/validator
 ```
 
 ## Development
@@ -89,7 +89,7 @@ docker build --target tests -t avc-versionfilevalidator . && docker run avc-vers
 #### Without Docker Container
 If you want to run the unit tests on your host, do the following.
 ```sh
-python3 -m unittest tests/main.py
+python3 -m unittest tests
 ```
 Note that the test framework assumes that your current working directory is this project's root.
 
