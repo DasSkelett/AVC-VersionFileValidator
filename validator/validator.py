@@ -38,13 +38,11 @@ def validate(exclude) -> (int, Set[Path], Set[Path], Set[Path]):
             # The actual validation happens here.
             check_single_file(f, schema)
         except json.decoder.JSONDecodeError as e:
-            log.error(f'Failed loading {str(f)} as JSON. Check for syntax errors around the mentioned line:')
-            log.error(e)
+            log.error(f'Failed loading {str(f)} as JSON. Check for syntax errors around the mentioned line: {e}')
             failed_files.add(f)
             continue
         except jsonschema.ValidationError as e:
-            log.error(f'Validation of {f} failed:')
-            log.error(e)
+            log.error(f'Validation of {f} failed: {e}')
             failed_files.add(f)
             continue
 
@@ -52,8 +50,7 @@ def validate(exclude) -> (int, Set[Path], Set[Path], Set[Path]):
 
     log.debug('Done!')
     if failed_files:
-        log.error('The following files failed validation:')
-        log.error([str(f) for f in failed_files])
+        log.error(f'The following files failed validation: {[str(f) for f in failed_files]}')
         return 1, successful_files, failed_files, ignored_files
     else:
         return 0, successful_files, failed_files, ignored_files
