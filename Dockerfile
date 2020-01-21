@@ -8,8 +8,8 @@ ENTRYPOINT ["python3.8"]
 FROM base as tests
 COPY tests/ /tests/
 WORKDIR /
-CMD ["-m", "unittest", "tests/main.py"]
+CMD ["-m", "unittest", "tests"]
 
 
 FROM base as prod
-CMD ["/validator/main.py"]
+CMD ["/validator"]
