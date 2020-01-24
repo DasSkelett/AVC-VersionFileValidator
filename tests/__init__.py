@@ -1,7 +1,7 @@
+from validator.utils import setup_logger
 from .default import *
+from .ksp_version import *
 from .singlefiles import *
 from .strangenames import *
-
-from validator.utils import setup_logger
 
 setup_logger(True)
