@@ -17,7 +17,7 @@ class TestStrangeNames(TestCase):
         os.chdir(cls.old_cwd)
 
     def test_findsAll(self):
-        (status, successful, failed, ignored) = validator.validate('')
+        (status, successful, failed, ignored) = validator.validate_cwd('')
         self.assertEqual(status, 1)
         self.assertSetEqual(successful, {Path('CAPS.VERSION')})
         self.assertSetEqual(failed, {Path('camelCaseVersionMissing.Version')})

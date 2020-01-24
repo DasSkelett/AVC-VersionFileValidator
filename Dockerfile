@@ -12,4 +12,5 @@ CMD ["-m", "unittest", "tests"]
 
 
 FROM base as prod
-CMD ["/validator"]
+COPY main.py /main.py
+CMD ["/main.py"]

@@ -8,8 +8,7 @@ import requests
 
 
 # Returns (status, successful, failed, ignored)
-def validate(exclude) -> (int, Set[Path], Set[Path], Set[Path]):
-
+def validate_cwd(exclude) -> (int, Set[Path], Set[Path], Set[Path]):
     all_exclusions = calculate_all_exclusions(exclude)
 
     # GH will set the cwd of the container to the so-called workspace, which is a clone of the triggering repo,

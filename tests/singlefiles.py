@@ -17,9 +17,9 @@ class TestSingleFiles(TestCase):
         os.chdir(cls.old_cwd)
 
     def test_invalidRemote(self):
-        (status, successful, failed, ignored) = validator.validate('')
+        (status, successful, failed, ignored) = validator.validate_cwd('')
         self.assertIn(Path('invalid-remote.version'), failed)
 
     def test_validRemote(self):
-        (status, successful, failed, ignored) = validator.validate('')
+        (status, successful, failed, ignored) = validator.validate_cwd('')
         self.assertIn(Path('valid-remote.version'), successful)
