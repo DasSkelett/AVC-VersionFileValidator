@@ -1,0 +1,27 @@
+name: Test full integration
+on:
+  push:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  full_integration_run:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+      - name: Install dependencies
+        run: |
+          pip3 install -r requirements.txt
+      - name: Run validator
+        run: |
+          export INPUT_EXCLUDE='["./failing/*"]'
+          cd tests/workspaces/default
+          python3 ../../../main.py
+
