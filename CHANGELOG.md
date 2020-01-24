@@ -4,6 +4,7 @@
 * Validate remote version file if specified with `URL` property.
 * Make the validator importable as a package (#4 by: DasSkelett)
 * Use logging instead of print(), make use of the Action logging syntax (#4 by: DasSkelett)
+* Implement KSP version comparison logic + warn for outdated KSP compatibilities (#5 by: DasSkelett)
 
 
 ## v1
