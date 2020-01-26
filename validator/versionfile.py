@@ -1,6 +1,7 @@
 import json
 
 import jsonschema
+import logging as log
 import requests
 
 from .ksp_version import KspVersion
@@ -50,6 +51,7 @@ class VersionFile:
             return self._remote
         if not self.url:
             return None
+        log.debug('Fetching remote...')
         self._remote = VersionFile(requests.get(self.url).content)
         return self._remote
 

@@ -37,19 +37,12 @@ def validate_cwd(exclude) -> (int, Set[Path], Set[Path], Set[Path]):
     build_map = get_build_map()
 
     for f in version_files:
-        try:
-            # The actual validation happens here.
-            check_single_file(f, schema, KspVersion(list(build_map.get('builds').values())[-1]))
-        except json.decoder.JSONDecodeError as e:
-            log.error(f'Failed loading {str(f)} as JSON. Check for syntax errors around the mentioned line: {e}')
+        # The actual validation happens here.
+        valid = check_single_file(f, schema, KspVersion(list(build_map.get('builds').values())[-1]))
+        if valid:
+            successful_files.add(f)
+        else:
             failed_files.add(f)
-            continue
-        except jsonschema.ValidationError as e:
-            log.error(f'Validation of {f} failed: {e}')
-            failed_files.add(f)
-            continue
-
-        successful_files.add(f)
 
     log.debug('Done!')
     if failed_files:
@@ -99,44 +92,58 @@ def get_build_map():
     return None
 
 
+# Returns a bool to indicate whether the file and its remote is valid or not.
 def check_single_file(f: Path, schema, latest_ksp):
-    log.debug(f'Loading {f}')
-    with f.open('r') as vf:
-        version_file = VersionFile(vf.read())
+    try:
+        log.info(f'Checking {f}')
+        with f.open('r') as vf:
+            log.debug(f'Loading {f}')
+            version_file = VersionFile(vf.read())
 
-    log.debug(f'Validating {f}')
-    version_file.validate(schema, False)
-    if not version_file.is_compatible_with_ksp(latest_ksp):
-        log.warning(f"The file {f} doesn't indicate compatibility "
-                    f"with the latest version of KSP ({str(latest_ksp)}). "
-                    f"Did you forget to update it?")
+        log.debug(f'Validating {f}')
+        version_file.validate(schema, False)
+        if not version_file.is_compatible_with_ksp(latest_ksp):
+            log.warning(f"The file {f} doesn't indicate compatibility "
+                        f"with the latest version of KSP ({str(latest_ksp)}). "
+                        f"Did you forget to update it?")
 
-    # Check remote version file
-    if remote := version_file.get_remote():
+        # Check remote version file
         try:
-            remote.validate(schema)
-            try:
-                if not remote.is_compatible_with_ksp(latest_ksp):
-                    log.warning(f"The remote version file of {f} doesn't indicate compatibility "
-                                f"with the latest version of KSP ({str(latest_ksp)}). "
-                                f"Did you forget to update it? {version_file.url}")
-            except:
-                pass
+            log.info(f'Checking remote of {f}')
+            if remote := version_file.get_remote():
+                remote.validate(schema)
+                try:
+                    if not remote.is_compatible_with_ksp(latest_ksp):
+                        log.warning(f"The remote version file of {f} doesn't indicate compatibility "
+                                    f"with the latest version of KSP ({str(latest_ksp)}). "
+                                    f"Did you forget to update it? {version_file.url}")
+                except:
+                    pass
 
-        except requests.exceptions.RequestException as e:
+        except requests.exceptions.RequestException:
             log.error(f'Failed downloading remote version file at {version_file.url}. '
                       'Note that the URL property, when used, '
-                      'must point to the "Location of a remote version file for update checking":')
-            raise e
+                      'must point to the "Location of a remote version file for update checking"')
+            return False
         except json.decoder.JSONDecodeError as e:
             log.error(f'Failed loading remote version file at {version_file.url}. '
-                      'Note that the URL property, when used, '
-                      'must point to the "Location of a remote version file for update checking":')
-            raise e
+                      f'Note that the URL property, when used, '
+                      f'must point to the "Location of a remote version file for update checking". '
+                      f'Check for a syntax error around the mentioned line: {e}')
+            return False
         except jsonschema.ValidationError as e:
             log.error(f'Validation failed for remote version file at {version_file.url}. '
-                      'Note that the URL property, when used, '
-                      'must point to the "Location of a remote version file for update checking":')
-            raise e
+                      f'Note that the URL property, when used, '
+                      f'must point to the "Location of a remote version file for update checking": {e}')
+            return False
 
-    log.info(f'Validation of {str(f)} successful.')
+    except json.decoder.JSONDecodeError as e:
+        log.error(f'Failed loading {f} as JSON. Check for syntax errors around the mentioned line: {e}')
+        return False
+
+    except jsonschema.ValidationError as e:
+        log.error(f'Validation of {f} failed: {e}')
+        return False
+
+    log.debug(f'Validation of {f} successful.')
+    return True
