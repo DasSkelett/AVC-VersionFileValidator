@@ -8,7 +8,7 @@ This is intended for authors and maintainers of [Kerbal Space Program](https://w
 No more missing commas that prevent your latest release from being indexed by the CKAN.
 
 ## Usage
-### As GitHub Action in a workflow (default)
+### In a GitHub workflow (default)
 Download the [standard workflow file](https://github.com/DasSkelett/AVC-VersionFileValidator/blob/master/examples/standard.yml) and save it under `<YourMod>/.github/workflows/AVC-VersionFileValidator.yml`.
 Then commit and push it to GitHub.
  
@@ -30,49 +30,48 @@ jobs:
       - name: Validate files
         uses: DasSkelett/AVC-VersionFileValidator@v1
 ```
-Make sure workflows are activated in your repository settings.
+Make sure workflows are activated in your repository settings:
+![workflow settings](https://user-images.githubusercontent.com/28812678/73135906-291fe300-4048-11ea-992a-3a0a3800c730.png)
+The top radio button should be selected.
 
-Optionally, add the following after `- name: Validate files` to exclude `invalid.version` and every version file in `test/corruptVersionFiles/` and any subdirectory of it:
+To exclude files, add a JSON array containing the paths to the files (relative from repo rooot) as `exclude` parameter after `- name: Validate files`:
 ```yaml
         with:
           exclude: '["./invalid.version", "./test/corruptVersionFiles/**/*.version"]'
 ```
-The supplied string has to be a valid JSON array (except it's a single file or globbing statement, then it can be a simple string)!
-For the globbing syntax, see the [pathlib documentation](https://docs.python.org/3.5/library/pathlib.html#pathlib.PurePath.match).
+You can also use globbing statements, for the syntax see syntax, see the [pathlib documentation](https://docs.python.org/3.5/library/pathlib.html#pathlib.PurePath.match).
 
 **For more workflow file examples, see the [examples folder](https://github.com/DasSkelett/AVC-VersionFileValidator/tree/master/examples).**
 
-### Validate single .version file once on your PC
-If you simply want to check the version file once locally, you don't have to use this action, just run:
-```sh
-wget https://raw.githubusercontent.com/linuxgurugamer/KSPAddonVersionChecker/master/KSP-AVC.schema.json
-pip3 install --user jsonschema
-python3 -m jsonschema -i YourMod.version KSP-AVC.schema.json
-```
-Is you use an IDEs that supports custom JSON schemas, I strongly recommend using this feature.
-
-### Validate multiple .version files once on your PC
-If you want to check an entire local directory with potentially multiple version files, use this action as standard Python application:
+### Use the package outside of a GitHub action, like Travis
+You need Python 3.8 installed! Setup:
 ```sh
 git clone https://github.com/DasSkelett/AVC-VersionFileValidator.git
 cd AVC-VersionFileValidator
-pip3 install --user -r requirements.txt
-# It is important that your current working directory is the directory where the version files you want to test are located!  
+python3.8 -m venv venv
+source venv/bin/activate
+pip install --user -r requirements.txt
+```
+Now use the validator. It is important that your current working directory is the directory where the version files you want to test are located! 
+Also make sure you have the venv activated!
+```
 cd ../<YourMod>
-python3 ../AVC-VersionFileValidator/validator
+python ../AVC-VersionFileValidator/main.py
 ```
 
+Furthermore, if you use an IDE that supports custom JSON schemas, I strongly recommend using this feature.
+
 ## Development
-## Set up development environment
+### Set up development environment
 I recommend setting up a virtual environment, especially if you are using an IDE:
 ```sh
-python3 -m venv venv
+python3.8 -m venv venv
 source venv/bin/activate
-pip3 install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 The Action itself is a Docker image/container (requirement by GitHub). You can use the same Dockerfile for running it locally,
-but remember to set the right environment variables if needed 
+but remember to set the right environment variables if needed .
 
 The repository is set up in a way that supports running the app directly or in a Docker container.
 Same goes for the tests. You only have to pay attention what your current working directory is when you invoke Python!  
@@ -87,20 +86,8 @@ docker build --target tests -t avc-versionfilevalidator . && docker run avc-vers
 ```
 
 #### Without Docker Container
-If you want to run the unit tests on your host, do the following.
+If you want to run the unit tests on your host, do the following (remember venv!):
 ```sh
-python3 -m unittest tests
+python -m unittest tests
 ```
 Note that the test framework assumes that your current working directory is this project's root.
-
-## TODO
-* Make GitHub build Dockerfile default stage only (currently also executes the steps in the `tests` stage, which is unnecessary)
-* Option to only check specific version files (should ignore exclusion)
-
-## This Action is based on instructions to create a Docker GitHub Action found here:
-
-> https://github.blog/2019-06-06-generate-new-repositories-with-repository-templates/.
->
-> https://github.com/actions/toolkit/blob/master/docs/container-action.md
->
-> https://help.github.com/en/actions/automating-your-workflow-with-github-actions/building-actions
