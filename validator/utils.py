@@ -45,6 +45,11 @@ class LogFormatter(logging.Formatter):
         # Call the original formatter class to do the grunt work
         result = logging.Formatter.format(self, record)
 
+        # If the log statements contains legacy formatted strings with %s / %d ...
+        # logging.Formatter.format() apparently tries to handle it, but doesn't somehow.
+        # Only encountered with requests.
+        result = result % record.args
+
         # Restore the original format configured by the user
         self._style._fmt = format_orig
 
