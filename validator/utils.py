@@ -2,14 +2,14 @@ import logging
 import sys
 
 
-def setup_logger(debug):
-    log = logging.getLogger('')
+def setup_logger(debug, logger_name=''):
+    log = logging.getLogger(logger_name)
     level = logging.DEBUG if debug else logging.INFO
     handler = logging.StreamHandler(sys.stdout)
     handler.setFormatter(LogFormatter())
     log.addHandler(handler)
     log.setLevel(level)
-    log.info(f'Logging started with level {level}')
+    log.info(f'Logger {logger_name} started with level {level}')
 
 
 # https://stackoverflow.com/a/14859558
