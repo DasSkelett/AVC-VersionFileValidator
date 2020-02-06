@@ -1,7 +1,8 @@
 import json
+import logging as log
+import re
 
 import jsonschema
-import logging as log
 import requests
 
 from .ksp_version import KspVersion
@@ -52,11 +53,11 @@ class VersionFile:
         if not self.url:
             return None
         log.debug('Fetching remote...')
-        self._remote = VersionFile(requests.get(self.url).content)
+        self._remote = VersionFile(requests.get(get_raw_uri(self.url)).content)
         return self._remote
 
     # Validates this and optional a remote version file. Throws all exception it encounters.
-    def validate(self, schema, validate_remote=False):
+    def validate(self, schema: dict, validate_remote=False):
         self.valid = False
         jsonschema.validate(self.json, schema)
 
@@ -69,5 +70,28 @@ class VersionFile:
         # No exceptions -> True
         self.valid = True
 
-    def is_compatible_with_ksp(self, version: KspVersion):
+    def is_compatible_with_ksp(self, version: KspVersion) -> bool:
         return version.is_contained_in(self.ksp_version, self.ksp_version_min, self.ksp_version_max)
+
+
+def get_raw_uri(uri: str) -> str:
+    # Returns (scheme, netloc, path, params, query, fragment) with the rule:
+    # <scheme>://<netloc>/<path>;<params>?<query>#<fragment>
+    parts = requests.utils.urlparse(uri)
+    if parts.netloc != 'github.com':
+        return uri
+
+    # Do a bit of a dance. We con't want to replace 'tree' or 'blob' if it's part of a filename.
+    # AVC doesn't pay attention to this, it replaces all occurrences of those two keys wherever they are,
+    # and potentially destroys URLs this way.
+    path_regex = re.compile(
+        '^/(?P<user>[^/]+)/(?P<repo>[^/]+)/(?P<key>(blob|tree))/(?P<branch>[^/]+)/(?P<path>.+)$'
+    )
+
+    repl = r'/\g<user>/\g<repo>/raw/\g<branch>/\g<path>'
+    path_subst = re.sub(pattern=path_regex, repl=repl, string=parts.path)
+    if '/blob/' in path_subst or '/tree/' in path_subst:
+        log.warning("Don't put version files in paths containing 'blob' or 'tree', AVC will break the URL.")
+
+    new_parts = (parts.scheme, parts.netloc, path_subst, parts.params, parts.query, parts.fragment)
+    return requests.utils.urlunparse(new_parts)
