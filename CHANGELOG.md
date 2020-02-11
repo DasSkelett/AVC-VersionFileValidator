@@ -1,6 +1,7 @@
 # This file contains all notable changes to the AVC-VersionFileValidator
 
 ## master (not included in any release yet)
+* Convert to GitHub raw URIs before downloading remote files (#7 by: DasSkelett)
 
 
 ## v1
