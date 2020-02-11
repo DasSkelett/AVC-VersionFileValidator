@@ -18,6 +18,7 @@ class KspVersion:
         if isinstance(version, str):
             if version == 'any':
                 self.any = True
+                return
             else:
                 self.any = False
                 match = self.rgx.fullmatch(version)
@@ -44,7 +45,8 @@ class KspVersion:
     # https://github.com/linuxgurugamer/KSPAddonVersionChecker/blob/90ca9738da412f31a95a29209784ad48e8d082c4/KSP-AVC/AddonInfo.cs#L149-L165
     # This is neat, because CKAN handles that pretty similar.
     def is_contained_in(self, ksp_version, ksp_version_min, ksp_version_max):
-        if self.any:
+        if self.any or getattr(ksp_version, 'any', False) \
+                or getattr(ksp_version_min, 'any', False) or getattr(ksp_version_max, 'any', False):
             return True
         if ksp_version_min and ksp_version_max:
             return ksp_version_min <= self <= ksp_version_max
