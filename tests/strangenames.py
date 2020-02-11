@@ -3,6 +3,7 @@ from pathlib import Path
 from unittest import TestCase
 
 import validator.validator as validator
+from .test_utils import schema, build_map
 
 
 class TestStrangeNames(TestCase):
@@ -17,7 +18,7 @@ class TestStrangeNames(TestCase):
         os.chdir(cls.old_cwd)
 
     def test_findsAll(self):
-        (status, successful, failed, ignored) = validator.validate_cwd('')
+        (status, successful, failed, ignored) = validator.validate_cwd('', schema, build_map)
         self.assertEqual(status, 1)
         self.assertSetEqual(successful, {Path('CAPS.VERSION')})
         self.assertSetEqual(failed, {Path('camelCaseVersionMissing.Version')})

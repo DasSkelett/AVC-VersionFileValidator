@@ -10,8 +10,15 @@ from .ksp_version import KspVersion
 from .versionfile import VersionFile
 
 
-# Returns (status, successful, failed, ignored)
-def validate_cwd(exclude) -> (int, Set[Path], Set[Path], Set[Path]):
+def validate_cwd(exclude, schema=None, build_map=None):
+    """Validates recursively the version files found in the current working directory.
+
+    :param exclude: A string formatted as JSON array containing files or directories to exclude. Supports wildcards.
+    :param schema: A **valid** Python object representing the schema. Use sparingly, intended for tests!
+    :param build_map: A **valid** Python object representing the build map. Use sparingly, intended for tests!
+    :return: A 4-tuple containing the validation status, valid files, failed files and ignored files.
+    :rtype: (int, Set[Path], Set[Path], Set[Path])
+    """
     all_exclusions = calculate_all_exclusions(exclude)
 
     # GH will set the cwd of the container to the so-called workspace, which is a clone of the triggering repo,
@@ -31,14 +38,23 @@ def validate_cwd(exclude) -> (int, Set[Path], Set[Path], Set[Path]):
         return 0, successful_files, failed_files, ignored_files
 
     log.info(f'Found {[str(f) for f in version_files]}')
-    schema = get_schema()
-    if not schema:
+
+    if schema is None:
+        schema = get_schema()
+    if schema is None:
         return 1, successful_files, failed_files, ignored_files
-    build_map = get_build_map()
+    if build_map is None:
+        build_map = get_build_map()
+
+    latest_ksp = None
+    if build_map is not None:
+        builds = build_map.get('builds', None)
+        if builds is not None:
+            latest_ksp = KspVersion(list(builds.values())[-1])
 
     for f in version_files:
         # The actual validation happens here.
-        valid = check_single_file(f, schema, KspVersion(list(build_map.get('builds').values())[-1]))
+        valid = check_single_file(f, schema, latest_ksp)
         if valid:
             successful_files.add(f)
         else:
@@ -102,7 +118,7 @@ def check_single_file(f: Path, schema, latest_ksp):
 
         log.debug(f'Validating {f}')
         version_file.validate(schema, False)
-        if not version_file.is_compatible_with_ksp(latest_ksp):
+        if latest_ksp is not None and not version_file.is_compatible_with_ksp(latest_ksp):
             log.warning(f"The file {f} doesn't indicate compatibility "
                         f"with the latest version of KSP ({str(latest_ksp)}). "
                         f"Did you forget to update it?")
@@ -113,7 +129,7 @@ def check_single_file(f: Path, schema, latest_ksp):
             if remote := version_file.get_remote():
                 remote.validate(schema)
                 try:
-                    if not remote.is_compatible_with_ksp(latest_ksp):
+                    if latest_ksp is not None and not remote.is_compatible_with_ksp(latest_ksp):
                         log.warning(f"The remote version file of {f} doesn't indicate compatibility "
                                     f"with the latest version of KSP ({str(latest_ksp)}). "
                                     f"Did you forget to update it? {version_file.url}")

@@ -71,6 +71,8 @@ class VersionFile:
         self.valid = True
 
     def is_compatible_with_ksp(self, version: KspVersion) -> bool:
+        if version is None:
+            return False
         return version.is_contained_in(self.ksp_version, self.ksp_version_min, self.ksp_version_max)
 
 
@@ -81,7 +83,7 @@ def get_raw_uri(uri: str) -> str:
     if parts.netloc != 'github.com':
         return uri
 
-    # Do a bit of a dance. We con't want to replace 'tree' or 'blob' if it's part of a filename.
+    # Do a bit of a dance. We don't want to replace 'tree' or 'blob' if it's part of a filename.
     # AVC doesn't pay attention to this, it replaces all occurrences of those two keys wherever they are,
     # and potentially destroys URLs this way.
     path_regex = re.compile(
