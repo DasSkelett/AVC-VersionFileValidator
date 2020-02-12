@@ -1,6 +1,6 @@
 # KSP-AVC Version File Validator
 
-![Unit Tests](https://github.com/DasSkelett/AVC-VersionFileValidator/workflows/Run%20unit%20tests/badge.svg) ![Full Integration Test](https://github.com/DasSkelett/AVC-VersionFileValidator/workflows/Test%20full%20integration/badge.svg)
+![Unit Tests](https://github.com/DasSkelett/AVC-VersionFileValidator/workflows/Unit%20Tests/badge.svg) ![Full Integration Test](https://github.com/DasSkelett/AVC-VersionFileValidator/workflows/Full%20Integration%20Test/badge.svg)
 
 This repository hosts a Docker-based GitHub Action written in Python3.8 that you can use in a workflow in your [KSP](https://www.kerbalspaceprogram.com/) mod repo.
 It will validate all [KSP-AVC](https://github.com/linuxgurugamer/KSPAddonVersionChecker) version files in the repository against [the official KSP-AVC schema](https://github.com/linuxgurugamer/KSPAddonVersionChecker/blob/master/KSP-AVC.schema.json).
@@ -52,7 +52,7 @@ git clone https://github.com/DasSkelett/AVC-VersionFileValidator.git
 cd AVC-VersionFileValidator
 python3.8 -m venv venv
 source venv/bin/activate
-pip install --user -r requirements.txt
+pip install -r requirements.txt
 ```
 Now use the validator. It is important that your current working directory is the directory where the version files you want to test are located! 
 Also make sure you have the venv activated!
@@ -64,7 +64,7 @@ python ../AVC-VersionFileValidator/main.py
 Furthermore, if you use an IDE that supports custom JSON schemas, I strongly recommend using this feature.
 
 ## Development
-### Set up development environment
+### Setup development environment
 I recommend setting up a virtual environment, especially if you are using an IDE:
 ```sh
 python3.8 -m venv venv

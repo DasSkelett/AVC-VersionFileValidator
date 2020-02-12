@@ -1,12 +1,14 @@
 # This file contains all notable changes to the AVC-VersionFileValidator
 
 ## master (not included in any release yet)
+
+
+## v1
+### v1.2.1
 * Convert to GitHub raw URIs before downloading remote files (#7 by: DasSkelett)
 * Fix incorrect compatibility warning for `"KSP_VERSION": "any"` (#8: by DasSkelett)
 * Download schema + build map only once during tests (#9 by: DasSkelett)
 
-
-## v1
 ### v1.2.0
 * Validate remote version file if specified with `URL` property.
 * Make the validator importable as a package (#4 by: DasSkelett)
