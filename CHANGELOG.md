@@ -2,6 +2,7 @@
 
 ## master (not included in any release yet)
 * Convert to GitHub raw URIs before downloading remote files (#7 by: DasSkelett)
+* Fix incorrect compatibility warning for `"KSP_VERSION": "any"` (#8: by DasSkelett)
 
 
 ## v1

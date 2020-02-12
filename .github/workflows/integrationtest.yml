@@ -1,4 +1,4 @@
-name: Test full integration
+name: Full Integration Test
 on:
   push:
   pull_request:

@@ -59,3 +59,18 @@ class TestKspVersion(TestCase):
         self.assertTrue(v_latest_ksp.is_contained_in(None, v_ksp_min, None))
         self.assertFalse(v_latest_ksp.is_contained_in(None, None, v_ksp_max))
         self.assertFalse(v_latest_ksp.is_contained_in(v_ksp, v_ksp_min, v_ksp_max))
+
+    def test_any_contains_all(self):
+        v_latest_ksp = KspVersion('1.8.1')
+        v_ksp = KspVersion('any')
+
+        self.assertTrue(v_latest_ksp.is_contained_in(v_ksp, None, None))
+
+    def test_any_contained_by_all(self):
+        # This shouldn't be encountered in the real world.
+        # The KSP version map from CKAN doesn't contain 'any'.
+        # But ss_contained_in() should still return True.
+        v_latest_ksp = KspVersion('any')
+        v_ksp = KspVersion('1.8.1')
+
+        self.assertTrue(v_latest_ksp.is_contained_in(v_ksp, None, None))
