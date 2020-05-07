@@ -1,6 +1,7 @@
 # This file contains all notable changes to the AVC-VersionFileValidator
 
 ## master (not included in any release yet)
+* Don't fail validation for invalid remote files (#11 by: DasSkelett)
 
 
 ## v1
