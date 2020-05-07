@@ -31,7 +31,8 @@ def validate_cwd(exclude, schema=None, build_map=None):
     failed_files = set()
     ignored_files = found_files.intersection(all_exclusions)
 
-    log.info(f'Ignoring {[str(f) for f in ignored_files]}')
+    if ignored_files:
+        log.info(f'Ignoring {[str(f) for f in ignored_files]}')
 
     if not version_files:
         log.warning('No version files found.')
@@ -137,21 +138,18 @@ def check_single_file(f: Path, schema, latest_ksp):
                     pass
 
         except requests.exceptions.RequestException:
-            log.error(f'Failed downloading remote version file at {version_file.url}. '
+            log.warning(f'Failed downloading remote version file at {version_file.url}. '
                       'Note that the URL property, when used, '
                       'must point to the "Location of a remote version file for update checking"')
-            return False
         except json.decoder.JSONDecodeError as e:
-            log.error(f'Failed loading remote version file at {version_file.url}. '
+            log.warning(f'Failed loading remote version file at {version_file.url}. '
                       f'Note that the URL property, when used, '
                       f'must point to the "Location of a remote version file for update checking". '
                       f'Check for a syntax error around the mentioned line: {e}')
-            return False
         except jsonschema.ValidationError as e:
-            log.error(f'Validation failed for remote version file at {version_file.url}. '
+            log.warning(f'Validation failed for remote version file at {version_file.url}. '
                       f'Note that the URL property, when used, '
                       f'must point to the "Location of a remote version file for update checking": {e}')
-            return False
 
     except json.decoder.JSONDecodeError as e:
         log.error(f'Failed loading {f} as JSON. Check for syntax errors around the mentioned line: {e}')
