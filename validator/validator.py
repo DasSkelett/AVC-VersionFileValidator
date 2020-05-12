@@ -27,23 +27,62 @@ def validate_cwd(exclude, schema=None, build_map=None):
                    if f.is_file() and f.suffix.lower() == '.version'}
 
     version_files = found_files.difference(all_exclusions)
-    successful_files = set()
-    failed_files = set()
     ignored_files = found_files.intersection(all_exclusions)
 
     if ignored_files:
         log.info(f'Ignoring {[str(f) for f in ignored_files]}')
 
+    (code, successful_files, failed_files) = check_file_set(version_files, schema, build_map)
+    return code, successful_files, failed_files, ignored_files
+
+
+def validate_list(file_list, schema=None, build_map=None):
+    """Validates all the given files in the list.
+
+    :param file_list: A list of strings that are relative or absolute paths to the files that should be validated.
+    :param schema: A **valid** Python object representing the schema. Use sparingly, intended for tests!
+    :param build_map: A **valid** Python object representing the build map. Use sparingly, intended for tests!
+    :return: A 4-tuple containing the validation status, valid files, failed files and ignored files.
+    :rtype: (int, Set[Path], Set[Path], Set[Path])
+    """
+    version_files = set()
+    nonexistent_files = set()
+    for f in file_list:
+        p = Path(f)
+        if p and p.is_file():
+            version_files.add(p)
+        else:
+            nonexistent_files.add(f)
+
+    if nonexistent_files:
+        log.info(f'Files {[str(f) for f in nonexistent_files]} don\'t exist')
+
+    (code, successful_files, failed_files) = check_file_set(version_files, schema, build_map)
+    return code, successful_files, failed_files, nonexistent_files
+
+
+def check_file_set(version_files, schema=None, build_map=None):
+    """Validates the given set of files.
+
+    :param version_files: A set of Path-es to validate.
+    :param schema: A **valid** Python object representing the schema. Use sparingly, intended for tests!
+    :param build_map: A **valid** Python object representing the build map. Use sparingly, intended for tests!
+    :return: A 4-tuple containing the validation status, valid files and failed files.
+    :rtype: (int, Set[Path], Set[Path])
+    """
+    successful_files = set()
+    failed_files = set()
+
     if not version_files:
         log.warning('No version files found.')
-        return 0, successful_files, failed_files, ignored_files
+        return 0, successful_files, failed_files
 
     log.info(f'Found {[str(f) for f in version_files]}')
 
     if schema is None:
         schema = get_schema()
     if schema is None:
-        return 1, successful_files, failed_files, ignored_files
+        return 1, successful_files, failed_files
     if build_map is None:
         build_map = get_build_map()
 
@@ -64,9 +103,9 @@ def validate_cwd(exclude, schema=None, build_map=None):
     log.debug('Done!')
     if failed_files:
         log.error(f'The following files failed validation: {[str(f) for f in failed_files]}')
-        return 1, successful_files, failed_files, ignored_files
+        return 1, successful_files, failed_files
     else:
-        return 0, successful_files, failed_files, ignored_files
+        return 0, successful_files, failed_files
 
 
 def calculate_all_exclusions(exclude: str) -> Set[Path]:

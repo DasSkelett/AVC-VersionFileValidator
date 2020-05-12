@@ -30,7 +30,7 @@ jobs:
         with:
           fetch-depth: 1
       - name: Validate files
-        uses: DasSkelett/AVC-VersionFileValidator@v1
+        uses: DasSkelett/AVC-VersionFileValidator
 ```
 Make sure workflows are activated in your repository settings:
 ![workflow settings](https://user-images.githubusercontent.com/28812678/73135906-291fe300-4048-11ea-992a-3a0a3800c730.png)
@@ -45,18 +45,22 @@ You can also use globbing statements, for the syntax see syntax, see the [pathli
 
 **For more workflow file examples, see the [examples folder](https://github.com/DasSkelett/AVC-VersionFileValidator/tree/master/examples).**
 
-### Use the package outside of a GitHub action, like Travis
+### Outside of a GitHub action, like locally or in Travis
 You need Python 3.8 installed! Setup:
 ```sh
 git clone https://github.com/DasSkelett/AVC-VersionFileValidator.git
 cd AVC-VersionFileValidator
 python3.8 -m venv venv
 source venv/bin/activate
-pip install -r requirements.txt
+pip install --upgrade -r requirements.txt
 ```
-Now use the validator. It is important that your current working directory is the directory where the version files you want to test are located! 
-Also make sure you have the venv activated!
+Now use the validator. Make sure you have the venv activated!
+```sh
+python main.py ../<YourMod>/GameData/<YourMod>/<YourMod>.version
 ```
+Alternatively, if there are more version files to be checked, switch your working directory to the root of your repo and execute main.py from there.
+It will search for version files recursively.
+```sh
 cd ../<YourMod>
 python ../AVC-VersionFileValidator/main.py
 ```
