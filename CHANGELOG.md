@@ -2,7 +2,7 @@
 
 ## master (not included in any release yet)
 * Don't fail validation for invalid remote files (#11 by: DasSkelett)
-
+* Update requirements (#12 by: DasSkelett)
 
 ## v1
 ### v1.2.1
