@@ -42,7 +42,7 @@ class VersionFile:
         self.ksp_version_min = KspVersion.try_parse(v) if (v := self.json.get('KSP_VERSION_MIN')) is not None else None
         self.ksp_version_max = KspVersion.try_parse(v) if (v := self.json.get('KSP_VERSION_MAX')) is not None else None
 
-        # I doubt we will ever have to handle with them, so I don't care about INSTALL_LOC* for now.
+        # I doubt we will ever have to deal with it, so we don't care about INSTALL_LOC* for now.
 
         self._remote = None
         self.valid = False
@@ -53,7 +53,7 @@ class VersionFile:
         if not self.url:
             return None
         log.debug('Fetching remote...')
-        self._remote = VersionFile(requests.get(get_raw_uri(self.url)).content)
+        self._remote = VersionFile(requests.get(get_raw_uri(self.url)).text)
         return self._remote
 
     # Validates this and optional a remote version file. Throws all exception it encounters.
