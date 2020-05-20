@@ -163,6 +163,25 @@ def check_single_file(f: Path, schema, latest_ksp):
                         f"with the latest version of KSP ({str(latest_ksp)}). "
                         f"Did you forget to update it?")
 
+        vmin = version_file.ksp_version_min
+        vmax = version_file.ksp_version_max
+        if vmin is not None and vmax is not None:
+            if vmin.fully_equals(vmax):
+                log.warning(f'KSP_VERSION_MIN and KSP_VERSION_MAX are the same. '
+                            f'Consider using KSP_VERSION instead.')
+
+            elif vmin.patch == 0 and str(vmax.patch).startswith('9'):
+                if vmin.major == vmax.major and vmin.minor == vmax.minor:
+                    target_version = KspVersion({"MAJOR": vmin.major, "MINOR": vmin.minor})
+                    log.warning(f'The KSP version range indicates compatibility with a full minor range. '
+                                f'Consider removing KSP_VERSION_MIN/MAX and adding KSP_VERSION {target_version} instead.')
+                else:
+                    target_version_min = KspVersion({"MAJOR": vmin.major, "MINOR": vmin.minor})
+                    target_version_max = KspVersion({"MAJOR": vmax.major, "MINOR": vmax.minor})
+                    log.warning(f'The KSP version range indicates compatibility across full minor ranges. '
+                                f'Consider changing KSP_VERSION_MIN to {target_version_min} and '
+                                f'KSP_VERSION_MAX to {target_version_max}.')
+
         # Check remote version file
         try:
             log.info(f'Checking remote of {f}')
@@ -178,17 +197,17 @@ def check_single_file(f: Path, schema, latest_ksp):
 
         except requests.exceptions.RequestException:
             log.warning(f'Failed downloading remote version file at {version_file.url}. '
-                      'Note that the URL property, when used, '
-                      'must point to the "Location of a remote version file for update checking"')
+                        f'Note that the URL property, when used, '
+                        f'must point to the "Location of a remote version file for update checking"')
         except json.decoder.JSONDecodeError as e:
             log.warning(f'Failed loading remote version file at {version_file.url}. '
-                      f'Note that the URL property, when used, '
-                      f'must point to the "Location of a remote version file for update checking". '
-                      f'Check for a syntax error around the mentioned line: {e}')
+                        f'Note that the URL property, when used, '
+                        f'must point to the "Location of a remote version file for update checking". '
+                        f'Check for a syntax error around the mentioned line: {e}')
         except jsonschema.ValidationError as e:
             log.warning(f'Validation failed for remote version file at {version_file.url}. '
-                      f'Note that the URL property, when used, '
-                      f'must point to the "Location of a remote version file for update checking": {e}')
+                        f'Note that the URL property, when used, '
+                        f'must point to the "Location of a remote version file for update checking": {e}')
 
     except json.decoder.JSONDecodeError as e:
         log.error(f'Failed loading {f} as JSON. Check for syntax errors around the mentioned line: {e}')

@@ -28,6 +28,7 @@ class KspVersion:
                 self.build = int(m) if (m := match.group('build')) is not None else None
 
         elif isinstance(version, dict):
+            self.any = False
             self.major = int(version.get('MAJOR'))
             self.minor = int(version.get('MINOR'))
             self.patch = int(m) if (m := version.get('PATCH')) is not None else None
@@ -58,6 +59,19 @@ class KspVersion:
         if ksp_version:
             return self == ksp_version
         return False
+
+    def fully_equals(self, other):
+        if self.any != other.any:
+            return False
+        if self.major != other.major:
+            return False
+        if self.minor != other.minor:
+            return False
+        if self.patch != other.patch:
+            return False
+        if self.build != other.build:
+            return False
+        return True
 
     def __eq__(self, other):
         return not self > other and not other > self
