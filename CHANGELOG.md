@@ -1,12 +1,14 @@
 # This file contains all notable changes to the AVC-VersionFileValidator
 
 ## master (not included in any release yet)
+
+## v1
+## v1.3.0
 * Don't fail validation for invalid remote files (#11 by: DasSkelett)
 * Update requirements (#12 by: DasSkelett)
 * Allow specifying list of files to validate in console (#13 by: DasSkelett)
 * Check version range for possible simplification (#14 by: DasSkelett)
 
-## v1
 ### v1.2.1
 * Convert to GitHub raw URIs before downloading remote files (#7 by: DasSkelett)
 * Fix incorrect compatibility warning for `"KSP_VERSION": "any"` (#8: by DasSkelett)
