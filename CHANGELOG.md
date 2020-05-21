@@ -1,6 +1,7 @@
 # This file contains all notable changes to the AVC-VersionFileValidator
 
 ## master (not included in any release yet)
+* Fix TypeError when formatting logging messages that don't have any args (#15 by: DasSkelett)
 
 ## v1
 ## v1.3.0

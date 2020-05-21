@@ -48,7 +48,14 @@ class LogFormatter(logging.Formatter):
         # If the log statements contains legacy formatted strings with %s / %d ...
         # logging.Formatter.format() apparently tries to handle it, but doesn't somehow.
         # Only encountered with requests.
-        result = result % record.args
+        # Update 2020-05-21, Python 3.8.2, requests 2.23.0:
+        # For some reason, this has changed now, and requests.exceptions are handled fine.
+        # Instead, this line itself throws the following exception, even for exceptions of other packages:
+        #     TypeError: not enough arguments for format string
+        # Since I think there's the possibility that other error messages would still need the following extra step,
+        # I'm going to keep the line for now, but put it behind an if-clause, which seems to work.
+        if record.args:
+            result = result % record.args
 
         # Restore the original format configured by the user
         self._style._fmt = format_orig
