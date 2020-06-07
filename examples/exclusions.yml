@@ -1,9 +1,11 @@
 # This workflow excludes some .version files.
 # It supports globbing according to Python3 pathlib.Path.glob() rules (so also recursive globs with `**`).
 # Make sure the exclusion string is a valid JSON array!
-name: Validate AVC .version files
+name: AVC .version file validation
 on:
   push:
+    branches:
+      - master
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:

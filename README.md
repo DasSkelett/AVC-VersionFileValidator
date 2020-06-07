@@ -16,9 +16,11 @@ Then commit and push it to GitHub.
  
 Alternatively, copy the following and put it in `<YourMod>/.github/workflows/AVC-VersionFileValidator.yml`.
 ```yaml
-name: Validate AVC .version files
+name: AVC .version file validation
 on:
   push:
+    branches:
+      - master
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
