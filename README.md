@@ -38,14 +38,29 @@ Make sure workflows are activated in your repository settings:
 ![workflow settings](https://user-images.githubusercontent.com/28812678/73135906-291fe300-4048-11ea-992a-3a0a3800c730.png)
 The top radio button should be selected.
 
-To exclude files, add a JSON array containing the paths to the files (relative from repo rooot) as `exclude` parameter after `- name: Validate files`:
+#### Parameters
+Workflow files support passing parameters to the executed Actions using the `with` property,
+The following options are available for the KSP-AVC Version File Validator:
+
+##### Blacklist / Exclusions
+To exclude files, add a JSON array containing the paths to the files (relative from repo root) as `exclude` parameter after `- name: Validate files`:
 ```yaml
         with:
-          exclude: '["./invalid.version", "./test/corruptVersionFiles/**/*.version"]'
+          exclude: '["./GameData/BundledMod/BundledMod.version", "./GameData/OtherBundledMod/**/*.version"]'
 ```
-You can also use globbing statements, for the syntax see syntax, see the [pathlib documentation](https://docs.python.org/3.5/library/pathlib.html#pathlib.PurePath.match).
+You can use globbing statements, for the syntax see the [pathlib documentation](https://docs.python.org/3.5/library/pathlib.html#pathlib.PurePath.match).
 
-**For more workflow file examples, see the [examples folder](https://github.com/DasSkelett/AVC-VersionFileValidator/tree/master/examples).**
+[Example](https://github.com/DasSkelett/AVC-VersionFileValidator/tree/master/examples/exclusions.yml)
+
+##### Whitelist / Inclusions
+If you only want to test a specific set of files, you can use the `only` parameter. Can't be used together with `exclude`!
+```yaml
+        with:
+          only: '["./GameData/YourMod/YourMod.version"]'
+```
+
+[Example](https://github.com/DasSkelett/AVC-VersionFileValidator/tree/master/examples/whitelist.yml)
+
 
 ### Outside of a GitHub action, like locally or in Travis
 You need Python 3.8 installed! Setup:

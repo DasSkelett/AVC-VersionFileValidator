@@ -1,0 +1,21 @@
+# This workflow only validates the files specified in the 'only' parameter.
+# Make sure the exclusion string is a valid JSON array!
+name: AVC .version file validation
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  validate_version_files:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      - name: Validate files
+        with:
+          only: '["./GameData/YourMod.version"]'
+        uses: DasSkelett/AVC-VersionFileValidator
