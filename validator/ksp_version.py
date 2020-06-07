@@ -22,6 +22,8 @@ class KspVersion:
             else:
                 self.any = False
                 match = self.rgx.fullmatch(version)
+                if match is None:
+                    raise TypeError(f'Malformed KSP version: {version}')
                 self.major = int(match.group('major'))
                 self.minor = int(match.group('minor'))
                 self.patch = int(m) if (m := match.group('patch')) is not None else None
@@ -34,9 +36,9 @@ class KspVersion:
             self.patch = int(m) if (m := version.get('PATCH')) is not None else None
             self.build = int(m) if (m := version.get('BUILD')) is not None else None
         else:
-            raise TypeError('The version is neither a well-formatted string nor a dict.')
+            raise TypeError(f'KSP version {version} is neither a well-formatted string nor a dict.')
         if not (self.major and self.minor):
-            raise TypeError('Version needs at least a MAJOR and MINOR.')
+            raise TypeError(f'A KSP version needs at least a MAJOR and MINOR: {version}')
 
     # From AVC code:
     # (Ignoring KSP_INCLUDE_VERSIONS and KSP_EXCLUDE_VERSIONS)

@@ -24,8 +24,14 @@ class TestSingleFiles(TestCase):
         with f.open('r') as vf:
             version_file = VersionFile(vf.read())
             with self.assertRaises(json.decoder.JSONDecodeError):
-                remote = version_file.get_remote()
+                version_file.get_remote()
 
-    def test_validRemote(self):
+    def test_validRemote_cwd(self):
         (status, successful, failed, ignored) = validator.validate_cwd('', schema, build_map)
         self.assertIn(Path('valid-remote.version'), successful)
+
+    def test_validRemote_list(self):
+        (status, successful, failed, ignored) = validator.validate_list(['./valid-remote.version'], schema, build_map)
+        wanted = set()
+        wanted.add(Path('valid-remote.version'))
+        self.assertEquals(wanted, successful)

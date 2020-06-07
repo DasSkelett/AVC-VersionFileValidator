@@ -28,6 +28,10 @@ class TestKspVersion(TestCase):
         v = KspVersion.try_parse('xxx.yyy.zzz')
         self.assertIsNone(v)
 
+    def test_parse_invalid(self):
+        with self.assertRaises(TypeError):
+            KspVersion('aaa.bbb.ccc')
+
     def test_comp_different_level(self):
         v1 = KspVersion('1.2.3')
         v2 = KspVersion('1.2')
@@ -74,3 +78,8 @@ class TestKspVersion(TestCase):
         v_ksp = KspVersion('1.8.1')
 
         self.assertTrue(v_latest_ksp.is_contained_in(v_ksp, None, None))
+
+    def test_fully_equals(self):
+        self.assertTrue(KspVersion('1.9.1.2788').fully_equals(KspVersion('1.9.1.2788')))
+        self.assertFalse(KspVersion('1.9.1.2788').fully_equals(KspVersion('1.9.1')))
+        self.assertFalse(KspVersion('1.9.1.2788').fully_equals(KspVersion('1.9.1.9999')))
