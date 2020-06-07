@@ -14,5 +14,5 @@ jobs:
           fetch-depth: 1
       - name: Validate files
         with:
-          only: '["./tests/workspaces/valid-remote.version"]'
+          only: '["./tests/workspaces/single-files/valid-remote.version"]'
         uses: DasSkelett/AVC-VersionFileValidator@master

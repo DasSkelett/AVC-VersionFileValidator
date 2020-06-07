@@ -1,6 +1,6 @@
 # KSP-AVC Version File Validator
 
-![Unit Tests](https://github.com/DasSkelett/AVC-VersionFileValidator/workflows/Unit%20Tests/badge.svg) ![Full Integration Test](https://github.com/DasSkelett/AVC-VersionFileValidator/workflows/Full%20Integration%20Test/badge.svg)
+![Unit Tests](https://github.com/DasSkelett/AVC-VersionFileValidator/workflows/Unit%20Tests/badge.svg) ![Full Integration Test](https://github.com/DasSkelett/AVC-VersionFileValidator/workflows/Full%20Integration%20Test/badge.svg) ![Full Integration Test (Docker)](https://github.com/DasSkelett/AVC-VersionFileValidator/workflows/Full%20Integration%20Test%20(Docker)/badge.svg)
 
 This repository hosts a Docker-based GitHub Action written in Python3.8 that you can use in a workflow in your [KSP](https://www.kerbalspaceprogram.com/) mod repo.
 It will validate all [KSP-AVC](https://github.com/linuxgurugamer/KSPAddonVersionChecker) version files in the repository against [the official KSP-AVC schema](https://github.com/linuxgurugamer/KSPAddonVersionChecker/blob/master/KSP-AVC.schema.json).
