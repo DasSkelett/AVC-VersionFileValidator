@@ -1,11 +1,24 @@
 #!/usr/bin/env python3.8
-
 import os
 import sys
 from distutils.util import strtobool
 
-from validator.utils import setup_logger
+from validator.utils import get_env_array
+from validator.logger import setup_logger
 from validator.validator import validate_cwd, validate_list
+
+
+def main():
+    if len(sys.argv) > 1:
+        # Assume the provided arguments are a list of files to check.
+        argv_whitelist = sys.argv[1:]
+        validate_list_of_files(argv_whitelist)
+    elif env_whitelist := get_env_array('INPUT_ONLY'):
+        # We got a whitelist of files to check via env var
+        validate_list_of_files(env_whitelist)
+    else:
+        # Else go the normal route and check everything in the cwd.
+        validate_current_repository()
 
 
 def validate_current_repository():
@@ -30,9 +43,4 @@ def validate_list_of_files(file_list):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        # Assume the provided arguments is a list of files to check.
-        file_list = sys.argv[1:]
-        validate_list_of_files(file_list)
-
-    validate_current_repository()
+    main()

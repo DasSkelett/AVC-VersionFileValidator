@@ -1,8 +1,9 @@
-from validator.utils import setup_logger
+from validator.logger import setup_logger
 from .default import *
 from .ksp_version import *
 from .singlefiles import *
 from .strangenames import *
+from .utils import *
 from .versionfile import *
 
 # Use logging.getLogger('tests').<lvl>() for logging in the tests.

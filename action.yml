@@ -6,6 +6,10 @@ inputs:
     description: 'JSON-array-like list of paths to version files to exclude (supports wildcards), e.g. ["KSP-AVC.version", "GameData/DogeCoinFlag/*.version"]'
     required: false
     default: ''
+  only:
+    description: 'JSON-array-like list of paths to version files to check exclusively (no wildcard support), e.g. ["GameData/YourMod/YourMod.version"]'
+    required: false
+    default: ''
 runs:
   using: 'docker'
   image: 'Dockerfile'

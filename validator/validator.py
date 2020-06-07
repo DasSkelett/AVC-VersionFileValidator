@@ -6,6 +6,7 @@ from typing import Set
 import jsonschema
 import requests
 
+from .utils import parse_json_array
 from .ksp_version import KspVersion
 from .versionfile import VersionFile
 
@@ -111,15 +112,7 @@ def check_file_set(version_files, schema=None, build_map=None):
 def calculate_all_exclusions(exclude: str) -> Set[Path]:
     all_exclusions = set()
     if exclude and not exclude.isspace():
-        try:
-            globs = json.loads(exclude)
-        except json.decoder.JSONDecodeError:
-            # Not a valid JSON array, assume it is a single exclusion glob
-            globs = [exclude]
-
-        # If someone passes a string like this: '"./*.version"'
-        if isinstance(globs, str):
-            globs = [globs]
+        globs = parse_json_array(exclude)
 
         for _glob in globs:
             all_exclusions = all_exclusions.union(Path().glob(_glob))

@@ -1,5 +1,4 @@
-# This workflow excludes some .version files.
-# It supports globbing according to Python3 pathlib.Path.glob() rules (so also recursive globs with `**`).
+# This workflow only validates the files specified in the 'only' parameter.
 # Make sure the exclusion string is a valid JSON array!
 name: AVC .version file validation
 on:
@@ -18,5 +17,5 @@ jobs:
           fetch-depth: 1
       - name: Validate files
         with:
-          exclude: '["./invalid.version", "./test/corruptVersionFiles/**/*.version"]'
+          only: '["./GameData/YourMod.version"]'
         uses: DasSkelett/AVC-VersionFileValidator

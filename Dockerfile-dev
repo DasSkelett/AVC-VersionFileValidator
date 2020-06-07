@@ -5,6 +5,7 @@ RUN pip3 install -r /requirements.txt
 ENTRYPOINT ["python3.8"]
 
 
-FROM base as prod
-COPY main.py /main.py
-CMD ["/main.py"]
+FROM base as tests
+COPY tests/ /tests/
+WORKDIR /
+CMD ["-m", "unittest", "tests"]

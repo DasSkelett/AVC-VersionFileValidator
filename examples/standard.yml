@@ -2,9 +2,11 @@
 # found in the root directory of the repository and any subdirectories,
 # whenever something is pushed to any branch in the repository, or to a "foreign" branch active in a pull request.
 # It should cover most cases.
-name: Validate AVC .version files
+name: AVC .version file validation
 on:
   push:
+    branches:
+      - master
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
