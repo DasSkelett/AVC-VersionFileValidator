@@ -1,10 +1,13 @@
 # This file contains all notable changes to the AVC-VersionFileValidator
 
 ## master (not included in any release yet)
+
+
+## v1
+##v1.3.1
 * Fix TypeError when formatting logging messages that don't have any args (#15 by: DasSkelett)
 * Add 'only' parameter to Action; Changes to this repo's workflow setup (#16 by: DasSkelett)
 
-## v1
 ## v1.3.0
 * Don't fail validation for invalid remote files (#11 by: DasSkelett)
 * Update requirements (#12 by: DasSkelett)
