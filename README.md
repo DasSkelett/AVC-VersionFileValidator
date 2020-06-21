@@ -32,7 +32,7 @@ jobs:
         with:
           fetch-depth: 1
       - name: Validate files
-        uses: DasSkelett/AVC-VersionFileValidator
+        uses: DasSkelett/AVC-VersionFileValidator@master
 ```
 Make sure workflows are activated in your repository settings:
 ![workflow settings](https://user-images.githubusercontent.com/28812678/73135906-291fe300-4048-11ea-992a-3a0a3800c730.png)

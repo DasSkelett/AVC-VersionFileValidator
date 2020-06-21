@@ -19,4 +19,4 @@ jobs:
       - name: Validate files
         with:
           exclude: '["./invalid.version", "./test/corruptVersionFiles/**/*.version"]'
-        uses: DasSkelett/AVC-VersionFileValidator
+        uses: DasSkelett/AVC-VersionFileValidator@master
