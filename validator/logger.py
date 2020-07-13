@@ -1,5 +1,6 @@
 import logging
 import sys
+from pathlib import Path
 
 
 def setup_logger(debug, logger_name=''):
@@ -12,13 +13,36 @@ def setup_logger(debug, logger_name=''):
     log.info(f'Logger {logger_name} started with level {level}')
 
 
+class LogExtra:
+    file: Path
+    line: int
+    col: int
+
+    def __init__(self, file: Path, line: int = 1, col: int = 1):
+        self.file = file
+        self.line = line
+        self.col = col
+
+    def asdict(self):
+        return {'file': self.file, 'line': self.line, 'col': self.col}
+
+
+def _ensure_line_col(record):
+    if not getattr(record, 'line', None):
+        record.line = 1
+    if not getattr(record, 'col', None):
+        record.col = 1
+
+
 # https://stackoverflow.com/a/14859558
 class LogFormatter(logging.Formatter):
 
     dbg_fmt = "::DEBUG::%(msg)s"
     info_fmt = "::INFO::%(msg)s"
     wrn_fmt = "::WARNING::%(msg)s"
+    wrn_file_fmt = "::WARNING file=%(file)s,line=%(line)d,col=%(col)d::%(msg)s"
     err_fmt = "::ERROR::%(msg)s"
+    err_file_fmt = "::ERROR file=%(file)s,line=%(line)d,col=%(col)d::%(msg)s"
 
     def __init__(self):
         super().__init__(fmt="%(levelno)d: %(msg)s", datefmt=None, style='%')
@@ -37,10 +61,18 @@ class LogFormatter(logging.Formatter):
             self._style._fmt = LogFormatter.info_fmt
 
         elif record.levelno == logging.WARNING:
-            self._style._fmt = LogFormatter.wrn_fmt
+            if getattr(record, 'file', None):
+                self._style._fmt = LogFormatter.wrn_file_fmt
+                _ensure_line_col(record)
+            else:
+                self._style._fmt = LogFormatter.wrn_fmt
 
         elif record.levelno == logging.ERROR:
-            self._style._fmt = LogFormatter.err_fmt
+            if getattr(record, 'file', None):
+                self._style._fmt = LogFormatter.err_file_fmt
+                _ensure_line_col(record)
+            else:
+                self._style._fmt = LogFormatter.err_fmt
 
         # Call the original formatter class to do the grunt work
         result = logging.Formatter.format(self, record)

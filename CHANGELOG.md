@@ -1,6 +1,8 @@
 # This file contains all notable changes to the AVC-VersionFileValidator
 
 ## master (not included in any release yet)
+* Point workflow examples to master branch 
+* Annotate warnings and errors in PR "Changes" overview
 
 
 ## v1
