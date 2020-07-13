@@ -1,6 +1,7 @@
 import json
 import logging as log
 import re
+from pathlib import Path
 
 import jsonschema
 import requests
@@ -10,7 +11,7 @@ from .ksp_version import KspVersion
 
 class VersionFile:
 
-    def __init__(self, content: str):
+    def __init__(self, content: str, path: Path):
 
         self.json = json.loads(content)
         self.raw = content
@@ -46,6 +47,7 @@ class VersionFile:
 
         self._remote = None
         self.valid = False
+        self.path = path
 
     def get_remote(self):
         if self._remote:
@@ -53,7 +55,8 @@ class VersionFile:
         if not self.url:
             return None
         log.debug('Fetching remote...')
-        self._remote = VersionFile(requests.get(get_raw_uri(self.url)).text)
+        # Give the remote version file the path of the local one so the logger puts the annotations in the right place.
+        self._remote = VersionFile(requests.get(get_raw_uri(self.url)).text, self.path)
         return self._remote
 
     # Validates this and optional a remote version file. Throws all exception it encounters.

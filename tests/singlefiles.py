@@ -22,7 +22,7 @@ class TestSingleFiles(TestCase):
     def test_invalidRemote(self):
         f = Path('./invalid-remote.version')
         with f.open('r') as vf:
-            version_file = VersionFile(vf.read())
+            version_file = VersionFile(vf.read(), f)
             with self.assertRaises(json.decoder.JSONDecodeError):
                 version_file.get_remote()
 
