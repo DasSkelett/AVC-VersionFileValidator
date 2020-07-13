@@ -146,6 +146,8 @@ def get_build_map():
 def check_single_file(f: Path, schema, latest_ksp):
     log.info(f'Checking {f}')
     log_extra = LogExtra(f)
+
+    # Primary version file validation
     try:
         with f.open('r') as vf:
             log.debug(f'Loading {f}')
@@ -153,61 +155,6 @@ def check_single_file(f: Path, schema, latest_ksp):
 
         log.debug(f'Validating {f}')
         version_file.validate(schema, False)
-        if latest_ksp is not None and not version_file.is_compatible_with_ksp(latest_ksp):
-            log.warning(f"The file {f} doesn't indicate compatibility "
-                        f"with the latest version of KSP ({str(latest_ksp)}). "
-                        f"Did you forget to update it?", extra=log_extra.asdict())
-
-        vmin = version_file.ksp_version_min
-        vmax = version_file.ksp_version_max
-        if vmin is not None and vmax is not None:
-            if vmin.fully_equals(vmax):
-                log.warning(f'KSP_VERSION_MIN and KSP_VERSION_MAX are the same. '
-                            f'Consider using KSP_VERSION instead.', extra=log_extra.asdict())
-
-            elif vmin.patch == 0 and str(vmax.patch).startswith('9'):
-                if vmin.major == vmax.major and vmin.minor == vmax.minor:
-                    target_version = KspVersion({"MAJOR": vmin.major, "MINOR": vmin.minor})
-                    log.warning(f'The KSP version range indicates compatibility with a full minor range. '
-                                f'Consider removing KSP_VERSION_MIN/MAX and adding KSP_VERSION {target_version} '
-                                f'instead.', extra=log_extra.asdict())
-                else:
-                    target_version_min = KspVersion({"MAJOR": vmin.major, "MINOR": vmin.minor})
-                    target_version_max = KspVersion({"MAJOR": vmax.major, "MINOR": vmax.minor})
-                    log.warning(f'The KSP version range indicates compatibility across full minor ranges. '
-                                f'Consider changing KSP_VERSION_MIN to {target_version_min} and '
-                                f'KSP_VERSION_MAX to {target_version_max}.', extra=log_extra.asdict())
-
-        # Check remote version file
-        try:
-            log.info(f'Checking remote of {f}')
-            if remote := version_file.get_remote():
-                remote.validate(schema)
-                try:
-                    if latest_ksp is not None and not remote.is_compatible_with_ksp(latest_ksp):
-                        log.warning(f"The remote version file of {f} doesn't indicate compatibility "
-                                    f"with the latest version of KSP ({str(latest_ksp)}). "
-                                    f"Did you forget to update it? {version_file.url}", extra=log_extra.asdict())
-                except:
-                    pass
-
-        except requests.exceptions.RequestException:
-            log.warning(f'Failed downloading remote version file at {version_file.url}. '
-                        f'Note that the URL property, when used, '
-                        f'must point to the "Location of a remote version file for update checking"',
-                        extra=log_extra.asdict())
-        except json.decoder.JSONDecodeError as e:
-            log_extra.line = e.lineno
-            log_extra.col = e.colno
-            log.warning(f'Failed loading remote version file at {version_file.url}. '
-                        f'Note that the URL property, when used, '
-                        f'must point to the "Location of a remote version file for update checking". '
-                        f'Check for a syntax error around the mentioned line: {e}', extra=log_extra.asdict())
-        except jsonschema.ValidationError as e:
-            log.warning(f'Validation failed for remote version file at {version_file.url}. '
-                        f'Note that the URL property, when used, '
-                        f'must point to the "Location of a remote version file for update checking": {e}',
-                        extra=log_extra.asdict())
 
     except json.decoder.JSONDecodeError as e:
         log_extra.line = e.lineno
@@ -217,8 +164,62 @@ def check_single_file(f: Path, schema, latest_ksp):
         return False
 
     except jsonschema.ValidationError as e:
-        log.error(f'Validation of {f} failed: {e}', log_extra.asdict(), extra=log_extra.asdict())
+        log.error(f'Validation of {f} failed: {e}', extra=log_extra.asdict())
         return False
+
+    # Secondary compatibility soft-checks
+    if latest_ksp is not None and not version_file.is_compatible_with_ksp(latest_ksp):
+        log.warning(f"The file {f} doesn't indicate compatibility "
+                    f"with the latest version of KSP ({str(latest_ksp)}). "
+                    f"Did you forget to update it?", extra=log_extra.asdict())
+
+    vmin = version_file.ksp_version_min
+    vmax = version_file.ksp_version_max
+    if vmin is not None and vmax is not None:
+        if vmin.fully_equals(vmax):
+            log.warning(f'KSP_VERSION_MIN and KSP_VERSION_MAX are the same. '
+                        f'Consider using KSP_VERSION instead.', extra=log_extra.asdict())
+
+        elif vmin.patch == 0 and str(vmax.patch).startswith('9'):
+            if vmin.major == vmax.major and vmin.minor == vmax.minor:
+                target_version = KspVersion({"MAJOR": vmin.major, "MINOR": vmin.minor})
+                log.warning(f'The KSP version range indicates compatibility with a full minor range. '
+                            f'Consider removing KSP_VERSION_MIN/MAX and adding KSP_VERSION {target_version} '
+                            f'instead.', extra=log_extra.asdict())
+            else:
+                target_version_min = KspVersion({"MAJOR": vmin.major, "MINOR": vmin.minor})
+                target_version_max = KspVersion({"MAJOR": vmax.major, "MINOR": vmax.minor})
+                log.warning(f'The KSP version range indicates compatibility across full minor ranges. '
+                            f'Consider changing KSP_VERSION_MIN to {target_version_min} and '
+                            f'KSP_VERSION_MAX to {target_version_max}.', extra=log_extra.asdict())
+
+    # Remote version file validation and compatibility checks
+    try:
+        log.info(f'Checking remote of {f}')
+        if remote := version_file.get_remote():
+            remote.validate(schema)
+            if latest_ksp is not None and not remote.is_compatible_with_ksp(latest_ksp):
+                log.warning(f"The remote version file of {f} doesn't indicate compatibility "
+                            f"with the latest version of KSP ({str(latest_ksp)}). "
+                            f"Did you forget to update it? {version_file.url}", extra=log_extra.asdict())
+
+    except requests.exceptions.RequestException:
+        log.warning(f'Failed downloading remote version file at {version_file.url}. '
+                    f'Note that the URL property, when used, '
+                    f'must point to the "Location of a remote version file for update checking"',
+                    extra=log_extra.asdict())
+    except json.decoder.JSONDecodeError as e:
+        log_extra.line = e.lineno
+        log_extra.col = e.colno
+        log.warning(f'Failed loading remote version file at {version_file.url}. '
+                    f'Note that the URL property, when used, '
+                    f'must point to the "Location of a remote version file for update checking". '
+                    f'Check for a syntax error around the mentioned line: {e}', extra=log_extra.asdict())
+    except jsonschema.ValidationError as e:
+        log.warning(f'Validation failed for remote version file at {version_file.url}. '
+                    f'Note that the URL property, when used, '
+                    f'must point to the "Location of a remote version file for update checking": {e}',
+                    extra=log_extra.asdict())
 
     log.debug(f'Validation of {f} successful.')
     return True
