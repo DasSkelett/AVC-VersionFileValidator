@@ -55,8 +55,9 @@ class VersionFile:
         if not self.url:
             return None
         log.debug('Fetching remote...')
-        # Give the remote version file the path of the local one so the logger puts the annotations in the right place.
-        self._remote = VersionFile(requests.get(get_raw_uri(self.url)).text, self.path)
+        response = requests.get(get_raw_uri(self.url))
+        response.raise_for_status()
+        self._remote = VersionFile(response.text, self.path)
         return self._remote
 
     # Validates this and optional a remote version file. Throws all exception it encounters.
