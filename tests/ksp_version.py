@@ -31,6 +31,10 @@ class TestKspVersion(TestCase):
     def test_parse_invalid(self):
         with self.assertRaises(TypeError):
             KspVersion('aaa.bbb.ccc')
+        with self.assertRaises(TypeError):
+            KspVersion({'MAJOR': 1})
+        with self.assertRaises(TypeError):
+            KspVersion('1')
 
     def test_comp_different_level(self):
         v1 = KspVersion('1.2.3')
