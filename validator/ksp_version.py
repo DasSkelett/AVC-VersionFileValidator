@@ -4,7 +4,7 @@ from functools import total_ordering
 
 @total_ordering
 class KspVersion:
-    rgx = re.compile('^(?P<major>\d+)\.(?P<minor>\d+)(\.(?P<patch>\d+))?(\.(?P<build>\d+))?$')
+    rgx = re.compile(r'^(?P<major>\d+)\.(?P<minor>\d+)(\.(?P<patch>\d+))?(\.(?P<build>\d+))?$')
 
     @classmethod
     def try_parse(cls, version):
@@ -31,14 +31,18 @@ class KspVersion:
 
         elif isinstance(version, dict):
             self.any = False
-            self.major = int(version.get('MAJOR'))
-            self.minor = int(version.get('MINOR'))
-            self.patch = int(m) if (m := version.get('PATCH')) is not None else None
-            self.build = int(m) if (m := version.get('BUILD')) is not None else None
+            ma = version.get('MAJOR')
+            mi = version.get('MINOR')
+            if ma and mi:
+                self.major = int(ma)
+                self.minor = int(mi)
+            else:
+                raise TypeError(f'A KSP version needs at least a MAJOR and MINOR: {version}')
+
+            self.patch = int(p) if (p := version.get('PATCH')) is not None else None
+            self.build = int(b) if (b := version.get('BUILD')) is not None else None
         else:
             raise TypeError(f'KSP version {version} is neither a well-formatted string nor a dict.')
-        if not (self.major and self.minor):
-            raise TypeError(f'A KSP version needs at least a MAJOR and MINOR: {version}')
 
     # From AVC code:
     # (Ignoring KSP_INCLUDE_VERSIONS and KSP_EXCLUDE_VERSIONS)

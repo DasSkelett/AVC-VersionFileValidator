@@ -3,6 +3,8 @@ import os
 from pathlib import Path
 from unittest import TestCase
 
+import requests
+
 import validator.validator as validator
 from validator.versionfile import VersionFile
 from .test_utils import schema, build_map
@@ -24,6 +26,14 @@ class TestSingleFiles(TestCase):
         with f.open('r') as vf:
             version_file = VersionFile(vf.read(), f)
             with self.assertRaises(json.decoder.JSONDecodeError):
+                version_file.get_remote()
+
+    def test_404Remote(self):
+        f = Path('./invalid-remote.version')
+        with f.open('r') as vf:
+            version_file = VersionFile(vf.read(), f)
+            version_file.url = 'https://github.com/404'
+            with self.assertRaises(requests.exceptions.RequestException):
                 version_file.get_remote()
 
     def test_validRemote_cwd(self):

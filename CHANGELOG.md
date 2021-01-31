@@ -2,7 +2,8 @@
 
 ## master (not included in any release yet)
 * Point workflow examples to master branch 
-* Annotate warnings and errors in PR "Changes" overview
+* Annotate warnings and errors in PR "Changes" overview (#17 by: DasSkelett)
+* Raise exception for bad HTTP codes of remote version files
 
 
 ## v1

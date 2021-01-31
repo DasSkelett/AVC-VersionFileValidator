@@ -10,7 +10,7 @@ def setup_logger(debug, logger_name=''):
     handler.setFormatter(LogFormatter())
     log.addHandler(handler)
     log.setLevel(level)
-    log.info(f'Logger {logger_name} started with level {level}')
+    log.debug(f'Logger {logger_name} started with level {level}')
 
 
 class LogExtra:
