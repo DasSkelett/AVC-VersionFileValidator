@@ -1,9 +1,8 @@
 #!/usr/bin/env python3.8
 import os
 import sys
-from distutils.util import strtobool
 
-from validator.utils import get_env_array
+from validator.utils import get_env_array, str_to_bool
 from validator.logger import setup_logger
 from validator.validator import validate_cwd, validate_list
 
@@ -22,7 +21,7 @@ def main():
 
 
 def validate_current_repository():
-    debug = bool(strtobool(os.getenv('INPUT_DEBUG', 'false')))
+    debug = str_to_bool(os.getenv('INPUT_DEBUG', 'false'))
     setup_logger(debug)
 
     exclude = os.getenv('INPUT_EXCLUDE', '')
@@ -33,7 +32,7 @@ def validate_current_repository():
 
 
 def validate_list_of_files(file_list):
-    debug = bool(strtobool(os.getenv('INPUT_DEBUG', 'false')))
+    debug = str_to_bool(os.getenv('INPUT_DEBUG', 'false'))
     setup_logger(debug)
 
     (status, successful, failed, ignored) = validate_list(file_list)

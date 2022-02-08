@@ -63,11 +63,11 @@ If you only want to test a specific set of files, you can use the `only` paramet
 
 
 ### Outside of a GitHub action, like locally or in Travis
-You need Python 3.8 installed! Setup:
+You need **Python 3.8 or above** installed! Setup:
 ```sh
 git clone https://github.com/DasSkelett/AVC-VersionFileValidator.git
 cd AVC-VersionFileValidator
-python3.8 -m venv venv
+python3.10 -m venv venv
 source venv/bin/activate
 pip install --upgrade -r requirements.txt
 ```
@@ -88,7 +88,7 @@ Furthermore, if you use an IDE that supports custom JSON schemas, I strongly rec
 ### Setup development environment
 I recommend setting up a virtual environment, especially if you are using an IDE:
 ```sh
-python3.8 -m venv venv
+python3.10 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```

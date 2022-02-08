@@ -1,10 +1,7 @@
-FROM python:3.8-alpine as base
-COPY validator/ /validator/
+FROM python:3.10-alpine as base
+
 COPY requirements.txt /requirements.txt
 RUN pip3 install -r /requirements.txt
-ENTRYPOINT ["python3.8"]
-
-
-FROM base as prod
+COPY validator/ /validator/
 COPY main.py /main.py
 CMD ["/main.py"]
