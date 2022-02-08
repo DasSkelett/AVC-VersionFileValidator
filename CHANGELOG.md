@@ -1,13 +1,16 @@
 # This file contains all notable changes to the AVC-VersionFileValidator
 
 ## master (not included in any release yet)
-* Point workflow examples to master branch 
-* Annotate warnings and errors in PR "Changes" overview (#17 by: DasSkelett)
-* Raise exception for bad HTTP codes of remote version files
 
 
 ## v1
-##v1.3.1
+## v1.4.0
+* Point workflow examples to master branch 
+* Annotate warnings and errors in PR "Changes" overview (#17 by: DasSkelett)
+* Raise exception for bad HTTP codes of remote version files
+* Update Dockerfile to Python 3.10
+
+## v1.3.1
 * Fix TypeError when formatting logging messages that don't have any args (#15 by: DasSkelett)
 * Add 'only' parameter to Action; Changes to this repo's workflow setup (#16 by: DasSkelett)
 
