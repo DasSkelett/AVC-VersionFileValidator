@@ -1,5 +1,6 @@
 import re
 from functools import total_ordering
+from typing import Any, Optional
 
 
 @total_ordering
@@ -7,18 +8,18 @@ class KspVersion:
     rgx = re.compile(r'^(?P<major>\d+)\.(?P<minor>\d+)(\.(?P<patch>\d+))?(\.(?P<build>\d+))?$')
 
     @classmethod
-    def try_parse(cls, version):
+    def try_parse(cls, version: Any):
         try:
             return KspVersion(version)
-        except:
+        except: # pylint: disable=bare-except
             return None
 
-    def __init__(self, version):
+    def __init__(self, version: Any):
+        # pylint: disable=invalid-name
         # Assume it's either 'any' or a semantic version according to the schema.
         if isinstance(version, str):
             if version == 'any':
                 self.any = True
-                return
             else:
                 self.any = False
                 match = self.rgx.fullmatch(version)
@@ -30,6 +31,7 @@ class KspVersion:
                 self.build = int(m) if (m := match.group('build')) is not None else None
 
         elif isinstance(version, dict):
+            # version: dict[str, str] = version
             self.any = False
             ma = version.get('MAJOR')
             mi = version.get('MINOR')
@@ -51,7 +53,7 @@ class KspVersion:
     # That means, ksp_version is ignored when _min and/or _max are defined.
     # https://github.com/linuxgurugamer/KSPAddonVersionChecker/blob/90ca9738da412f31a95a29209784ad48e8d082c4/KSP-AVC/AddonInfo.cs#L149-L165
     # This is neat, because CKAN handles that pretty similar.
-    def is_contained_in(self, ksp_version, ksp_version_min, ksp_version_max):
+    def is_contained_in(self, ksp_version: Optional['KspVersion'], ksp_version_min: 'Optional[KspVersion]', ksp_version_max: 'Optional[KspVersion]') -> bool:
         if self.any or getattr(ksp_version, 'any', False) \
                 or getattr(ksp_version_min, 'any', False) or getattr(ksp_version_max, 'any', False):
             return True
@@ -66,7 +68,7 @@ class KspVersion:
             return self == ksp_version
         return False
 
-    def fully_equals(self, other):
+    def fully_equals(self, other: 'KspVersion') -> bool:
         if self.any != other.any:
             return False
         if self.major != other.major:
@@ -79,37 +81,45 @@ class KspVersion:
             return False
         return True
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, KspVersion):
+            return False
         return not self > other and not other > self
 
-    def __gt__(self, other):
+    def __gt__(self, other: Any) -> bool: # pylint: disable=too-many-return-statements,too-many-branches
+        if not isinstance(other, KspVersion):
+            return False
         # Thanks to the  regex we can assume everything is a int.
         # We can also assume major and minor exist.
         # One specialty: a.b is always equal to a.b.c and a.b.c.d
         if self.major > other.major:
             return True
-        elif self.major < other.major:
+        if self.major < other.major:
             return False
+
         if self.minor > other.minor:
             return True
-        elif self.minor < other.minor:
+        if self.minor < other.minor:
             return False
+
         if self.patch and other.patch:
             if self.patch > other.patch:
                 return True
-            elif self.patch < other.patch:
+            if self.patch < other.patch:
                 return False
         else:
             return False
+
         if self.build and other.build:
             if self.build > other.build:
                 return True
-            elif self.build < other.build:
+            if self.build < other.build:
                 return False
-            elif self.build == other.build:
+            if self.build == other.build:
                 return False
         else:
             return False
+        return False
 
     def __str__(self):
         string = '' + str(self.major)

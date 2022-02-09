@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import sys
+from typing import List
 
 from validator.utils import get_env_array, str_to_bool
 from validator.logger import setup_logger
@@ -28,17 +29,17 @@ def validate_current_repository():
 
     (status, successful, failed, ignored) = validate_cwd(exclude)
     print(f'Exiting with status {status}: {len(successful)} successful, {len(failed)} failed, {len(ignored)} ignored.')
-    exit(status)
+    sys.exit(status)
 
 
-def validate_list_of_files(file_list):
+def validate_list_of_files(file_list: List[str]):
     debug = str_to_bool(os.getenv('INPUT_DEBUG', 'false'))
     setup_logger(debug)
 
     (status, successful, failed, ignored) = validate_list(file_list)
 
     print(f'Exiting with status {status}: {len(successful)} successful, {len(failed)} failed, {len(ignored)} ignored.')
-    exit(status)
+    sys.exit(status)
 
 
 if __name__ == "__main__":

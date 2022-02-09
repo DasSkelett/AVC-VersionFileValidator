@@ -1,7 +1,7 @@
 import json
 import logging as log
 from pathlib import Path
-from typing import Set
+from typing import Dict, List, Optional, Set, Tuple
 
 import jsonschema
 import requests
@@ -12,7 +12,10 @@ from .utils import parse_json_array
 from .versionfile import VersionFile
 
 
-def validate_cwd(exclude, schema=None, build_map=None):
+BuildMap = Dict[str, Dict[str, str]]
+
+
+def validate_cwd(exclude: str, schema: Optional[object]=None, build_map: Optional[BuildMap]=None) -> Tuple[int, Set[Path], Set[Path], Set[Path]]:
     """Validates recursively the version files found in the current working directory.
 
     :param exclude: A string formatted as JSON array containing files or directories to exclude. Supports wildcards.
@@ -38,7 +41,7 @@ def validate_cwd(exclude, schema=None, build_map=None):
     return code, successful_files, failed_files, ignored_files
 
 
-def validate_list(file_list, schema=None, build_map=None):
+def validate_list(file_list: List[str], schema: Optional[object]=None, build_map: Optional[BuildMap]=None):
     """Validates all the given files in the list.
 
     :param file_list: A list of strings that are relative or absolute paths to the files that should be validated.
@@ -47,14 +50,14 @@ def validate_list(file_list, schema=None, build_map=None):
     :return: A 4-tuple containing the validation status, valid files, failed files and ignored files.
     :rtype: (int, Set[Path], Set[Path], Set[Path])
     """
-    version_files = set()
-    nonexistent_files = set()
+    version_files: Set[Path] = set()
+    nonexistent_files: Set[Path] = set()
     for f in file_list:
         p = Path(f)
-        if p and p.is_file():
+        if p.is_file():
             version_files.add(p)
         else:
-            nonexistent_files.add(f)
+            nonexistent_files.add(p)
 
     if nonexistent_files:
         log.info(f'Files {[str(f) for f in nonexistent_files]} don\'t exist')
@@ -63,7 +66,7 @@ def validate_list(file_list, schema=None, build_map=None):
     return code, successful_files, failed_files, nonexistent_files
 
 
-def _check_file_set(version_files, schema=None, build_map=None):
+def _check_file_set(version_files: Set[Path], schema: Optional[object]=None, build_map: Optional[BuildMap]=None) -> Tuple[int, Set[Path], Set[Path]]:
     """Validates the given set of files. For internal use only.
 
     :param version_files: A set of Path-es to validate.
@@ -72,8 +75,8 @@ def _check_file_set(version_files, schema=None, build_map=None):
     :return: A 4-tuple containing the validation status, valid files and failed files.
     :rtype: (int, Set[Path], Set[Path])
     """
-    successful_files = set()
-    failed_files = set()
+    successful_files: Set[Path] = set()
+    failed_files: Set[Path] = set()
 
     if not version_files:
         log.warning('No version files found.')
@@ -111,7 +114,7 @@ def _check_file_set(version_files, schema=None, build_map=None):
 
 
 def _calculate_all_exclusions(exclude: str) -> Set[Path]:
-    all_exclusions = set()
+    all_exclusions: Set[Path] = set()
     if exclude and not exclude.isspace():
         globs = parse_json_array(exclude)
 
@@ -131,7 +134,7 @@ def get_schema():
         return None
 
 
-def get_build_map():
+def get_build_map() -> Optional[BuildMap]:
     log.debug('Fetching build map...')
     try:
         return requests.get('https://github.com/KSP-CKAN/CKAN-meta/raw/master/builds.json').json()
@@ -143,7 +146,8 @@ def get_build_map():
 
 
 # Returns a bool to indicate whether the file and its remote is valid or not.
-def check_single_file(f: Path, schema, latest_ksp):
+def check_single_file(f: Path, schema: object, latest_ksp: Optional[KspVersion]):
+    # pylint: disable=too-many-branches
     log.info(f'Checking {f}')
     log_extra = LogExtra(f)
 
@@ -154,7 +158,7 @@ def check_single_file(f: Path, schema, latest_ksp):
             version_file = VersionFile(vf.read(), f)
 
         log.debug(f'Validating {f}')
-        version_file.validate(schema, False)
+        version_file.validate(schema)
 
     except json.decoder.JSONDecodeError as e:
         log_extra.line = e.lineno

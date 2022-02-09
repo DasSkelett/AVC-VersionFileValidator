@@ -1,0 +1,7 @@
+mypy
+pylint
+pytest
+pytest-mypy
+pytest-pylint
+types-request
+types-jsonschema

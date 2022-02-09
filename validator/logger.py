@@ -3,14 +3,14 @@ import sys
 from pathlib import Path
 
 
-def setup_logger(debug, logger_name=''):
+def setup_logger(debug: bool, logger_name: str=''):
     log = logging.getLogger(logger_name)
     level = logging.DEBUG if debug else logging.INFO
     handler = logging.StreamHandler(sys.stdout)
     handler.setFormatter(LogFormatter())
     log.addHandler(handler)
     log.setLevel(level)
-    log.debug(f'Logger {logger_name} started with level {level}')
+    log.debug('Logger %s started with level %s', logger_name, level)
 
 
 class LogExtra:
@@ -27,7 +27,7 @@ class LogExtra:
         return {'file': self.file, 'line': self.line, 'col': self.col}
 
 
-def _ensure_line_col(record):
+def _ensure_line_col(record: logging.LogRecord):
     if not getattr(record, 'line', None):
         record.line = 1
     if not getattr(record, 'col', None):
@@ -36,6 +36,7 @@ def _ensure_line_col(record):
 
 # https://stackoverflow.com/a/14859558
 class LogFormatter(logging.Formatter):
+    # pylint: disable=protected-access
 
     dbg_fmt = "::DEBUG::%(msg)s"
     info_fmt = "::INFO::%(msg)s"
@@ -47,7 +48,7 @@ class LogFormatter(logging.Formatter):
     def __init__(self):
         super().__init__(fmt="%(levelno)d: %(msg)s", datefmt=None, style='%')
 
-    def format(self, record):
+    def format(self, record: logging.LogRecord):
 
         # Save the original format configured by the user
         # when the logger formatter was instantiated

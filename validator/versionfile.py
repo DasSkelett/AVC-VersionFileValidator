@@ -1,7 +1,9 @@
 import json
 import logging as log
 import re
+import urllib.parse
 from pathlib import Path
+from typing import Optional
 
 import jsonschema
 import requests
@@ -12,6 +14,7 @@ from .ksp_version import KspVersion
 class VersionFile:
 
     def __init__(self, content: str, path: Path):
+        # pylint: disable=invalid-name
 
         self.json = json.loads(content)
         self.raw = content
@@ -46,10 +49,9 @@ class VersionFile:
         # I doubt we will ever have to deal with it, so we don't care about INSTALL_LOC* for now.
 
         self._remote = None
-        self.valid = False
         self.path = path
 
-    def get_remote(self):
+    def get_remote(self) -> Optional['VersionFile']:
         if self._remote:
             return self._remote
         if not self.url:
@@ -61,18 +63,9 @@ class VersionFile:
         return self._remote
 
     # Validates this and optional a remote version file. Throws all exception it encounters.
-    def validate(self, schema: dict, validate_remote=False):
-        self.valid = False
+    def validate(self, schema: object) -> None:
         jsonschema.validate(self.json, schema)
-
-        if not validate_remote:
-            self.valid = True
-            return
-
-        remote = self.get_remote()
-        remote.validate(schema, False)
-        # No exceptions -> True
-        self.valid = True
+        # No exceptions -> valid
 
     def is_compatible_with_ksp(self, version: KspVersion) -> bool:
         if version is None:
@@ -83,7 +76,7 @@ class VersionFile:
 def get_raw_uri(uri: str) -> str:
     # Returns (scheme, netloc, path, params, query, fragment) with the rule:
     # <scheme>://<netloc>/<path>;<params>?<query>#<fragment>
-    parts = requests.utils.urlparse(uri)
+    parts = urllib.parse.urlparse(uri)
     if parts.netloc != 'github.com':
         return uri
 
@@ -100,4 +93,4 @@ def get_raw_uri(uri: str) -> str:
         log.warning("Don't put version files in paths containing 'blob' or 'tree', AVC will break the URL.")
 
     new_parts = (parts.scheme, parts.netloc, path_subst, parts.params, parts.query, parts.fragment)
-    return requests.utils.urlunparse(new_parts)
+    return urllib.parse.urlunparse(new_parts)

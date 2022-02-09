@@ -1,0 +1,15 @@
+[MASTER]
+ignore-paths=tests
+
+[FORMAT]
+max-line-length=120
+
+[MESSAGES CONTROL]
+disable =
+    line-too-long,
+    duplicate-code,
+    missing-module-docstring,
+    missing-class-docstring,
+    missing-function-docstring,
+    too-many-instance-attributes,
+    too-few-public-methods,
